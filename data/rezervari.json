@@ -1,0 +1,180 @@
+{
+  "_instructiuni": {
+    "ce_este": "Rezervarile existente. Alimenteaza DOUA mecanisme diferite, prin steaguri din nomenclatoare.json:",
+    "mecanism_1": "blocheaza_calendar -> check_availability elimina perioada din disponibil",
+    "mecanism_2": "ancoreaza_matching -> calculate_quote acorda reduceri zilelor din jurul rezervarii",
+    "ATENTIE": "Datele de mai jos sunt CONSTRUITE pentru testare, nu reale. Sunt asezate intentionat ca sa produca scenarii verificabile (vezi campul _scenariu_test).",
+    "zi_de_referinta": "2026-09-17",
+    "buffer": "MHC = 1 zi, GC = 2 zile. Prima zi libera = sfarsit + buffer + 1."
+  },
+
+  "rezervari": [
+    {
+      "id": "REZ-2026-0001",
+      "vehicul_id": "AR-001",
+      "client": "C-1042",
+      "data_start": "2026-07-05",
+      "data_sfarsit": "2026-07-19",
+      "status": "arhivat",
+      "_scenariu_test": "istoric incheiat - ancoreaza matching, dar e in trecut"
+    },
+    {
+      "id": "REZ-2026-0002",
+      "vehicul_id": "GC-001",
+      "client": "C-1055",
+      "data_start": "2026-08-01",
+      "data_sfarsit": "2026-08-15",
+      "status": "arhivat",
+      "_scenariu_test": "istoric incheiat"
+    },
+    {
+      "id": "REZ-2026-0003",
+      "vehicul_id": "GC-004",
+      "client": "C-1061",
+      "data_start": "2026-08-10",
+      "data_sfarsit": "2026-08-20",
+      "status": "arhivat",
+      "_scenariu_test": "istoric incheiat"
+    },
+
+    {
+      "id": "REZ-2026-0010",
+      "vehicul_id": "GC-002",
+      "client": "C-1077",
+      "data_start": "2026-09-12",
+      "data_sfarsit": "2026-09-22",
+      "status": "in_calatorie",
+      "_scenariu_test": "in desfasurare chiar acum - vehiculul nu e disponibil azi"
+    },
+    {
+      "id": "REZ-2026-0011",
+      "vehicul_id": "AR-002",
+      "client": "C-1080",
+      "data_start": "2026-09-15",
+      "data_sfarsit": "2026-09-20",
+      "status": "in_calatorie",
+      "_scenariu_test": "in desfasurare chiar acum"
+    },
+
+    {
+      "id": "REZ-2026-0020",
+      "vehicul_id": "GC-001",
+      "client": "C-1090",
+      "data_start": "2026-10-01",
+      "data_sfarsit": "2026-10-10",
+      "status": "platit",
+      "_scenariu_test": "MATCHING inainte: buffer GC=2 blocheaza 11 si 12 oct -> prima zi libera 13 oct (-50%), 14 oct (-25%)"
+    },
+    {
+      "id": "REZ-2026-0021",
+      "vehicul_id": "GC-001",
+      "client": "C-1091",
+      "data_start": "2026-11-01",
+      "data_sfarsit": "2026-11-08",
+      "status": "contractat",
+      "_scenariu_test": "MATCHING dupa: buffer blocheaza 30 si 31 oct -> ultima zi libera 29 oct (-50%), 28 oct (-25%). Impreuna cu REZ-0020 formeaza o fereastra cu reducere la AMBELE capete"
+    },
+    {
+      "id": "REZ-2026-0022",
+      "vehicul_id": "AR-001",
+      "client": "C-1095",
+      "data_start": "2026-10-05",
+      "data_sfarsit": "2026-10-09",
+      "status": "contractat",
+      "_scenariu_test": "MATCHING la alt partener: buffer MHC=1 blocheaza doar 10 oct -> prima zi libera 11 oct"
+    },
+    {
+      "id": "REZ-2026-0023",
+      "vehicul_id": "GC-003",
+      "client": "C-1101",
+      "data_start": "2026-12-20",
+      "data_sfarsit": "2027-01-05",
+      "status": "platit",
+      "_scenariu_test": "trece peste Anul Nou - testeaza sezonul extrasezon 10-15 -> 04-14"
+    },
+
+    {
+      "id": "REZ-2027-0001",
+      "vehicul_id": "GC-005",
+      "client": "C-1120",
+      "data_start": "2027-07-10",
+      "data_sfarsit": "2027-07-24",
+      "status": "contractat",
+      "_scenariu_test": "varf de sezon"
+    },
+    {
+      "id": "REZ-2027-0002",
+      "vehicul_id": "GC-005",
+      "client": "C-1121",
+      "data_start": "2027-08-05",
+      "data_sfarsit": "2027-08-18",
+      "status": "platit",
+      "_scenariu_test": "MATCHING in varf de sezon: fereastra libera 27 iul - 2 aug, cu reducere la ambele capete"
+    },
+    {
+      "id": "REZ-2027-0003",
+      "vehicul_id": "GC-007",
+      "client": "C-1130",
+      "data_start": "2027-06-15",
+      "data_sfarsit": "2027-06-28",
+      "status": "contractat",
+      "_scenariu_test": "sezon"
+    },
+    {
+      "id": "REZ-2027-0004",
+      "vehicul_id": "AR-001",
+      "client": "C-1135",
+      "data_start": "2027-07-01",
+      "data_sfarsit": "2027-07-15",
+      "status": "platit",
+      "_scenariu_test": "varf de sezon la MHC"
+    },
+    {
+      "id": "REZ-2027-0005",
+      "vehicul_id": "GC-009",
+      "client": "C-1140",
+      "data_start": "2027-05-01",
+      "data_sfarsit": "2027-05-10",
+      "status": "contractat",
+      "_scenariu_test": "sezon"
+    },
+
+    {
+      "id": "REZ-2026-0030",
+      "vehicul_id": "GC-004",
+      "client": "C-1150",
+      "data_start": "2026-10-15",
+      "data_sfarsit": "2026-10-25",
+      "status": "cerere",
+      "_scenariu_test": "PROVIZORIU: NU blocheaza, NU ancoreaza matching, DAR agentul avertizeaza"
+    },
+    {
+      "id": "REZ-2026-0031",
+      "vehicul_id": "GC-006",
+      "client": "C-1151",
+      "data_start": "2026-11-10",
+      "data_sfarsit": "2026-11-18",
+      "status": "oferta",
+      "_scenariu_test": "PROVIZORIU: oferta trimisa, asteptam raspuns"
+    },
+    {
+      "id": "REZ-2026-0032",
+      "vehicul_id": "GC-008",
+      "client": "C-1152",
+      "data_start": "2026-10-20",
+      "data_sfarsit": "2026-10-28",
+      "status": "contractare",
+      "_scenariu_test": "PROVIZORIU: documente in lucru"
+    },
+
+    {
+      "id": "REZ-2026-0040",
+      "vehicul_id": "GC-010",
+      "client": "C-1160",
+      "data_start": "2026-10-05",
+      "data_sfarsit": "2026-10-12",
+      "status": "anulat",
+      "_scenariu_test": "ANULAT: niciun efect - nici blocare, nici matching, nici avertisment"
+    }
+  ]
+}

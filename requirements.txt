@@ -1,0 +1,30 @@
+# ---------------------------------------------------------------
+# QA Agent Autorulote - dependinte
+# Instalare:  py -3.11 -m pip install -r requirements.txt
+# ---------------------------------------------------------------
+
+# --- LangChain: abstractizarea peste provideri (Lectia 1, slide 42) ---
+langchain==1.4.1
+langchain-core==1.6.3
+
+# --- Providerii concreti: comuti intre ei doar din .env (Factory Pattern) ---
+langchain-ollama==1.1.0
+langchain-google-genai==4.4.0
+
+# --- Tools: validare parametri + generare JSON Schema (Lectia 2, S7.3) ---
+pydantic==2.13.5
+
+# --- Prompts: fisiere .yaml + templating Jinja2 (Lectia 2, S3.2-S3.4) ---
+PyYAML==6.0.3
+Jinja2==3.1.6
+
+# --- Config: citeste .env si il pune in os.environ ---
+python-dotenv==1.1.1
+
+# --- Observability: LangSmith (Lectia 2, S8.3) ---
+langsmith==0.13.0
+
+# --- Baza de date IANA pentru fusuri orare ---
+# Linux/macOS o au in sistem; Windows NU. Fara ea, ZoneInfo("Europe/Bucharest")
+# arunca ZoneInfoNotFoundError.
+tzdata==2025.2

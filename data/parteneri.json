@@ -1,0 +1,239 @@
+{
+  "_instructiuni": {
+    "ce_este": "NIVELUL 2 al cascadei. Fiecare partener isi are aici TOATE regulile comerciale si operationale.",
+    "regula_de_repartizare": "Ce e 'per partener' sta aici. Ce e 'per autorulota' sta in flota.json. Fara exceptii.",
+    "ATENTIE_VALORI": "Sezoanele, preturile, procentele si conditiile de mai jos sunt PLAUZIBILE, nu reale. De inlocuit cu grilele efective ale fiecarui partener.",
+    "format_perioade": "Sezoanele se scriu ca LL-ZZ (luna-zi), recurent in fiecare an. Un interval poate trece peste Anul Nou (ex. 11-01 -> 03-31); codul trateaza cazul.",
+    "matching_scara": "offset = distanta in zile fata de prima zi libera dupa o rezervare ferma. offset 0 = chiar prima zi libera. Reducerea apartine ZILEI de calendar, nu sejurului: cine incepe mai tarziu prinde mai putin."
+  },
+
+  "parteneri": [
+    {
+      "id": "MHC",
+      "nume": "Motorhome Camper",
+      "activ": true,
+
+      "reguli_operationale": {
+        "sistem_calcul": "nopti",
+        "zile_buffer": 1,
+        "taxa_curatenie": 60,
+        "moneda": "EUR"
+      },
+
+      "conditii_sofer": {
+        "varsta_minima": 25,
+        "vechime_permis_ani": 3,
+        "categorii_permis": ["B"]
+      },
+
+      "sezoane": [
+        {
+          "cod": "extrasezon",
+          "nume": "Extrasezon",
+          "perioade": [{"de_la": "11-01", "pana_la": "03-31"}],
+          "durata_minima_zile": 3
+        },
+        {
+          "cod": "sezon",
+          "nume": "Sezon",
+          "perioade": [
+            {"de_la": "04-01", "pana_la": "06-30"},
+            {"de_la": "09-01", "pana_la": "10-31"}
+          ],
+          "durata_minima_zile": 5
+        },
+        {
+          "cod": "varf",
+          "nume": "Varf de sezon",
+          "perioade": [{"de_la": "07-01", "pana_la": "08-31"}],
+          "durata_minima_zile": 7
+        }
+      ],
+
+      "pachete_km": [
+        {
+          "cod": "standard",
+          "nume": "Standard",
+          "km_inclusi_pe_zi": 200,
+          "pret_km_suplimentar": 0.35,
+          "supliment_pe_zi": 0,
+          "implicit": true
+        },
+        {
+          "cod": "nelimitat",
+          "nume": "Kilometraj nelimitat",
+          "km_inclusi_pe_zi": null,
+          "pret_km_suplimentar": 0,
+          "supliment_pe_zi": 20,
+          "implicit": false
+        }
+      ],
+
+      "discounturi": {
+        "durata": {
+          "extrasezon": [
+            {"min_zile": 7, "procent": 12},
+            {"min_zile": 10, "procent": 18},
+            {"min_zile": 14, "procent": 25}
+          ],
+          "sezon": [
+            {"min_zile": 7, "procent": 8},
+            {"min_zile": 10, "procent": 12},
+            {"min_zile": 14, "procent": 16}
+          ],
+          "varf": [
+            {"min_zile": 7, "procent": 3},
+            {"min_zile": 10, "procent": 5},
+            {"min_zile": 14, "procent": 8}
+          ]
+        },
+        "early_booking": {
+          "extrasezon": {"min_zile_inainte": 60, "procent": 10},
+          "sezon": {"min_zile_inainte": 60, "procent": 7},
+          "varf": {"min_zile_inainte": 60, "procent": 5}
+        }
+      },
+
+      "matching": {
+        "activ": true,
+        "scara": [
+          {"offset": 0, "procent": 50},
+          {"offset": 1, "procent": 25}
+        ]
+      },
+
+      "extraoptiuni": [
+        {"id": "suport_biciclete", "pret": 30, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "scaun_copil", "pret": 20, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "lenjerie_pat", "pret": 15, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "set_bucatarie", "pret": 25, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "mobilier_exterior", "pret": 20, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "gratar", "pret": 20, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "kit_iarna", "pret": 35, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "sofer_suplimentar", "pret": 40, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "animal_companie", "pret": 50, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "wifi_mobil", "pret": 5, "unitate_tarifare": "pe_zi", "activ": true}
+      ]
+    },
+
+    {
+      "id": "GC",
+      "nume": "Green Camper",
+      "activ": true,
+
+      "reguli_operationale": {
+        "sistem_calcul": "zile",
+        "zile_buffer": 2,
+        "taxa_curatenie": 75,
+        "moneda": "EUR"
+      },
+
+      "conditii_sofer": {
+        "varsta_minima": 23,
+        "vechime_permis_ani": 2,
+        "categorii_permis": ["B"]
+      },
+
+      "sezoane": [
+        {
+          "cod": "extrasezon",
+          "nume": "Extrasezon",
+          "perioade": [{"de_la": "10-15", "pana_la": "04-14"}],
+          "durata_minima_zile": 3
+        },
+        {
+          "cod": "sezon",
+          "nume": "Sezon",
+          "perioade": [
+            {"de_la": "04-15", "pana_la": "06-30"},
+            {"de_la": "09-01", "pana_la": "10-14"}
+          ],
+          "durata_minima_zile": 3
+        },
+        {
+          "cod": "varf",
+          "nume": "Varf de sezon",
+          "perioade": [{"de_la": "07-01", "pana_la": "08-31"}],
+          "durata_minima_zile": 7
+        }
+      ],
+
+      "pachete_km": [
+        {
+          "cod": "standard",
+          "nume": "Standard",
+          "km_inclusi_pe_zi": 250,
+          "pret_km_suplimentar": 0.30,
+          "supliment_pe_zi": 0,
+          "implicit": true
+        },
+        {
+          "cod": "redus",
+          "nume": "Economic",
+          "km_inclusi_pe_zi": 150,
+          "pret_km_suplimentar": 0.30,
+          "supliment_pe_zi": -8,
+          "implicit": false
+        },
+        {
+          "cod": "nelimitat",
+          "nume": "Kilometraj nelimitat",
+          "km_inclusi_pe_zi": null,
+          "pret_km_suplimentar": 0,
+          "supliment_pe_zi": 25,
+          "implicit": false
+        }
+      ],
+
+      "discounturi": {
+        "durata": {
+          "extrasezon": [
+            {"min_zile": 7, "procent": 15},
+            {"min_zile": 10, "procent": 20},
+            {"min_zile": 14, "procent": 28}
+          ],
+          "sezon": [
+            {"min_zile": 7, "procent": 10},
+            {"min_zile": 10, "procent": 14},
+            {"min_zile": 14, "procent": 18}
+          ],
+          "varf": [
+            {"min_zile": 7, "procent": 5},
+            {"min_zile": 10, "procent": 7},
+            {"min_zile": 14, "procent": 10}
+          ]
+        },
+        "early_booking": {
+          "extrasezon": {"min_zile_inainte": 60, "procent": 8},
+          "sezon": {"min_zile_inainte": 60, "procent": 6},
+          "varf": {"min_zile_inainte": 60, "procent": 4}
+        }
+      },
+
+      "matching": {
+        "activ": true,
+        "scara": [
+          {"offset": 0, "procent": 50},
+          {"offset": 1, "procent": 25}
+        ]
+      },
+
+      "extraoptiuni": [
+        {"id": "suport_biciclete", "pret": 35, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "scaun_copil", "pret": 25, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "lenjerie_pat", "pret": 18, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "set_bucatarie", "pret": 30, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "mobilier_exterior", "pret": 25, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "gratar", "pret": 25, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "kit_iarna", "pret": 40, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "butelie_suplimentara", "pret": 20, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "cort_marchiza", "pret": 45, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "sofer_suplimentar", "pret": 45, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "animal_companie", "pret": 60, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "predare_alt_punct", "pret": 90, "unitate_tarifare": "pe_inchiriere", "activ": true},
+        {"id": "wifi_mobil", "pret": 6, "unitate_tarifare": "pe_zi", "activ": true},
+        {"id": "reducere_fransiza", "pret": 12, "unitate_tarifare": "pe_zi", "activ": true}
+      ]
+    }
+  ]
+}

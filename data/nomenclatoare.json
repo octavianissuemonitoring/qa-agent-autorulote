@@ -1,0 +1,142 @@
+{
+  "_instructiuni": {
+    "ce_este": "Nomenclatoare globale - liste de valori permise, folosite ca referinta de celelalte fisiere.",
+    "de_ce_aici": "Regulile de business stau in DATE, nu in cod. Daca maine apare un status nou, adaugi o linie aici si nimic din cod nu se modifica.",
+    "cum_citesti_steagurile": {
+      "blocheaza_calendar": "true = perioada nu mai e disponibila pentru o noua inchiriere",
+      "ancoreaza_matching": "true = rezervarea genereaza zile cu discount de matching in jurul ei",
+      "avertizeaza": "true = agentul mentioneaza clientului ca exista interes pe acea perioada"
+    }
+  },
+
+  "statusuri_rezervare": [
+    {
+      "cod": "cerere",
+      "nume": "Cerere",
+      "etapa": "pipeline",
+      "blocheaza_calendar": false,
+      "ancoreaza_matching": false,
+      "avertizeaza": true,
+      "descriere": "Clientul a solicitat informatii. Nimic nu e angajat."
+    },
+    {
+      "cod": "oferta",
+      "nume": "Oferta trimisa",
+      "etapa": "pipeline",
+      "blocheaza_calendar": false,
+      "ancoreaza_matching": false,
+      "avertizeaza": true,
+      "descriere": "S-a transmis o oferta de pret. Asteptam raspunsul clientului."
+    },
+    {
+      "cod": "contractare",
+      "nume": "In contractare",
+      "etapa": "pipeline",
+      "blocheaza_calendar": false,
+      "ancoreaza_matching": false,
+      "avertizeaza": true,
+      "descriere": "Documentele sunt in lucru, contractul nu e semnat inca."
+    },
+    {
+      "cod": "contractat",
+      "nume": "Contractat",
+      "etapa": "ferm",
+      "blocheaza_calendar": true,
+      "ancoreaza_matching": true,
+      "avertizeaza": false,
+      "descriere": "Contract semnat. Perioada e angajata."
+    },
+    {
+      "cod": "platit",
+      "nume": "Platit",
+      "etapa": "ferm",
+      "blocheaza_calendar": true,
+      "ancoreaza_matching": true,
+      "avertizeaza": false,
+      "descriere": "Contract semnat si incasat."
+    },
+    {
+      "cod": "in_calatorie",
+      "nume": "In calatorie",
+      "etapa": "ferm",
+      "blocheaza_calendar": true,
+      "ancoreaza_matching": true,
+      "avertizeaza": false,
+      "descriere": "Autorulota e la client, inchirierea e in desfasurare."
+    },
+    {
+      "cod": "predat",
+      "nume": "Predat",
+      "etapa": "ferm",
+      "blocheaza_calendar": true,
+      "ancoreaza_matching": true,
+      "avertizeaza": false,
+      "descriere": "Autorulota a fost returnata, dosarul nu e inchis inca."
+    },
+    {
+      "cod": "arhivat",
+      "nume": "Arhivat",
+      "etapa": "ferm",
+      "blocheaza_calendar": true,
+      "ancoreaza_matching": true,
+      "avertizeaza": false,
+      "descriere": "Inchiriere incheiata si inchisa. Ramane in istoric."
+    },
+    {
+      "cod": "anulat",
+      "nume": "Anulat",
+      "etapa": "inchis",
+      "blocheaza_calendar": false,
+      "ancoreaza_matching": false,
+      "avertizeaza": false,
+      "descriere": "Rezervare anulata. Nu produce niciun efect."
+    }
+  ],
+
+  "sisteme_calcul": [
+    {
+      "cod": "zile",
+      "nume": "Pe zile calendaristice",
+      "formula": "(data_sfarsit - data_start) + 1 zi",
+      "descriere": "Fiecare zi calendaristica atinsa se taxeaza. 10-12 august = 3 zile."
+    },
+    {
+      "cod": "nopti",
+      "nume": "Pe nopti (model hotelier)",
+      "formula": "(data_sfarsit - data_start)",
+      "descriere": "Se taxeaza noptile petrecute. 10-12 august = 2 nopti."
+    }
+  ],
+
+  "unitati_tarifare": [
+    {"cod": "pe_zi", "nume": "Pe zi/noapte de inchiriere", "descriere": "Pretul se inmulteste cu numarul de unitati."},
+    {"cod": "pe_inchiriere", "nume": "O singura data per inchiriere", "descriere": "Pret fix, indiferent de durata."}
+  ],
+
+  "regimuri_extraoptiuni": [
+    {
+      "cod": "inclus",
+      "nume": "Inclus in pret",
+      "se_taxeaza": false,
+      "se_poate_cere": true,
+      "descriere": "Dotarea exista deja pe autorulota si nu se taxeaza. Se mentioneaza in oferta ca avantaj.",
+      "mesaj_agent": "Este deja inclusa in pretul de inchiriere."
+    },
+    {
+      "cod": "optional",
+      "nume": "Disponibila contra cost",
+      "se_taxeaza": true,
+      "se_poate_cere": true,
+      "descriere": "Se poate adauga la inchiriere, la pretul stabilit de partener.",
+      "mesaj_agent": "Se poate adauga contra cost."
+    },
+    {
+      "cod": "indisponibil",
+      "nume": "Nu se poate monta",
+      "se_taxeaza": false,
+      "se_poate_cere": false,
+      "descriere": "Autorulota nu suporta aceasta optiune. Agentul refuza explicit si propune alternativa.",
+      "mesaj_agent": "Nu este disponibila pentru aceasta autorulota."
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "_instructiuni": {
+    "ce_este": "Starea tehnica si de conformitate a fiecarei autorulote. Alimenteaza tool-ul check_fleet_status.",
+    "ATENTIE": "Datele sunt CONSTRUITE pentru testare, nu reale. Cateva scadente sunt asezate intentionat aproape de 2026-09-17, ca sa produca alerte vizibile.",
+    "zi_de_referinta": "2026-09-17",
+    "revizie": "Se face la km (interval_revizie_km) SAU la data (urmatoarea_revizie_data), care vine prima."
+  },
+
+  "mentenanta": [
+    {
+      "vehicul_id": "AR-001",
+      "itp_expira": "2027-04-18",
+      "rca_expira": "2026-09-30",
+      "casco_expira": "2027-01-15",
+      "rovinieta_expira": "2026-12-31",
+      "km_actuali": 68400,
+      "ultima_revizie_km": 60000,
+      "interval_revizie_km": 15000,
+      "urmatoarea_revizie_data": "2027-02-10",
+      "observatii": "RCA expira in mai putin de 2 saptamani."
+    },
+    {
+      "vehicul_id": "AR-002",
+      "itp_expira": "2027-08-22",
+      "rca_expira": "2027-03-11",
+      "casco_expira": "2027-03-11",
+      "rovinieta_expira": "2027-01-20",
+      "km_actuali": 31250,
+      "ultima_revizie_km": 30000,
+      "interval_revizie_km": 15000,
+      "urmatoarea_revizie_data": "2027-05-04",
+      "observatii": ""
+    },
+    {
+      "vehicul_id": "GC-001",
+      "itp_expira": "2026-10-05",
+      "rca_expira": "2027-02-28",
+      "casco_expira": "2027-02-28",
+      "rovinieta_expira": "2026-11-15",
+      "km_actuali": 44800,
+      "ultima_revizie_km": 30000,
+      "interval_revizie_km": 15000,
+      "urmatoarea_revizie_data": "2026-12-01",
+      "observatii": "ITP expira in curand SI revizia la km e aproape (44.800 din 45.000)."
+    },
+    {
+      "vehicul_id": "GC-002",
+      "itp_expira": "2027-06-30",
+      "rca_expira": "2027-06-30",
+      "casco_expira": "2027-06-30",
+      "rovinieta_expira": "2027-04-01",
+      "km_actuali": 52100,
+      "ultima_revizie_km": 45000,
+      "interval_revizie_km": 15000,
+      "urmatoarea_revizie_data": "2027-03-15",
+      "observatii": ""
+    },
+    {
+      "vehicul_id": "GC-003",
+      "itp_expira": "2027-11-12",
+      "rca_expira": "2026-10-08",
+      "casco_expira": "2027-05-20",
+      "rovinieta_expira": "2026-10-08",
+      "km_actuali": 76900,
+      "ultima_revizie_km": 75000,
+      "interval_revizie_km": 15000,
+      "urmatoarea_revizie_data": "2027-07-01",
+      "observatii": "RCA si rovinieta expira in aceeasi zi, in mai putin de o luna."
+    },
+    {
+      "vehicul_id": "GC-004",
+      "itp_expira": "2028-03-01",
+      "rca_expira": "2027-03-01",
+      "casco_expira": "2027-03-01",
+      "rovinieta_expira": "2027-03-01",
+      "km_actuali": 8900,
+      "ultima_revizie_km": 0,
+      "interval_revizie_km": 20000,
+      "urmatoarea_revizie_data": "2027-03-01",
+      "observatii": "Vehicul nou, prima revizie nu a fost facuta inca."
+    },
+    {
+      "vehicul_id": "GC-005",
+      "itp_expira": "2028-03-01",
+      "rca_expira": "2027-03-01",
+      "casco_expira": "2027-03-01",
+      "rovinieta_expira": "2027-03-01",
+      "km_actuali": 7200,
+      "ultima_revizie_km": 0,
+      "interval_revizie_km": 20000,
+      "urmatoarea_revizie_data": "2027-03-01",
+      "observatii": "Vehicul nou."
+    },
+    {
+      "vehicul_id": "GC-006",
+      "itp_expira": "2028-03-01",
+      "rca_expira": "2027-03-01",
+      "casco_expira": "2027-03-01",
+      "rovinieta_expira": "2027-03-01",
+      "km_actuali": 6100,
+      "ultima_revizie_km": 0,
+      "interval_revizie_km": 20000,
+      "urmatoarea_revizie_data": "2027-03-01",
+      "observatii": "Vehicul nou."
+    },
+    {
+      "vehicul_id": "GC-007",
+      "itp_expira": "2027-05-17",
+      "rca_expira": "2027-05-17",
+      "casco_expira": "2027-05-17",
+      "rovinieta_expira": "2026-12-05",
+      "km_actuali": 91500,
+      "ultima_revizie_km": 90000,
+      "interval_revizie_km": 15000,
+      "urmatoarea_revizie_data": "2027-04-20",
+      "observatii": "Kilometraj ridicat."
+    },
+    {
+      "vehicul_id": "GC-008",
+      "itp_expira": "2027-09-09",
+      "rca_expira": "2027-01-25",
+      "casco_expira": "2027-01-25",
+      "rovinieta_expira": "2026-10-02",
+      "km_actuali": 103400,
+      "ultima_revizie_km": 90000,
+      "interval_revizie_km": 15000,
+      "urmatoarea_revizie_data": "2027-02-14",
+      "observatii": "Rovinieta expira in 2 saptamani. Revizie la km apropiata (103.400 din 105.000)."
+    },
+    {
+      "vehicul_id": "GC-009",
+      "itp_expira": "2027-07-03",
+      "rca_expira": "2027-07-03",
+      "casco_expira": "2027-07-03",
+      "rovinieta_expira": "2027-02-11",
+      "km_actuali": 87600,
+      "ultima_revizie_km": 75000,
+      "interval_revizie_km": 15000,
+      "urmatoarea_revizie_data": "2027-06-01",
+      "observatii": ""
+    },
+    {
+      "vehicul_id": "GC-010",
+      "itp_expira": "2027-10-28",
+      "rca_expira": "2027-04-14",
+      "casco_expira": "2027-04-14",
+      "rovinieta_expira": "2027-04-14",
+      "km_actuali": 39200,
+      "ultima_revizie_km": 30000,
+      "interval_revizie_km": 15000,
+      "urmatoarea_revizie_data": "2027-08-01",
+      "observatii": ""
+    }
+  ]
+}

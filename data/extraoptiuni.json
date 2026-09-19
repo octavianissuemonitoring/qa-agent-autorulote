@@ -1,0 +1,110 @@
+{
+  "_instructiuni": {
+    "ce_este": "NIVELUL 1 al cascadei: catalogul GLOBAL de extraoptiuni. Ce poate exista in sistem, in principiu.",
+    "cascada": "extraoptiuni.json (ce EXISTA) -> parteneri.json (ce OFERA fiecare partener, cu pret) -> flota.json (ce se poate MONTA pe fiecare autorulota)",
+    "regula": "Un partener poate oferi doar id-uri din lista asta. Un vehicul poate avea doar id-uri pe care partenerul lui le ofera.",
+    "unitate_tarifare": "Valoarea implicita. Fiecare partener o poate suprascrie cu propria politica.",
+    "fara_pret_aici": "Catalogul global NU contine preturi. Pretul e decizie comerciala, deci apartine partenerului."
+  },
+
+  "extraoptiuni": [
+    {
+      "id": "suport_biciclete",
+      "nume": "Suport biciclete",
+      "categorie": "echipament",
+      "unitate_tarifare": "pe_inchiriere",
+      "descriere": "Suport montat pe spate pentru 2-4 biciclete."
+    },
+    {
+      "id": "scaun_copil",
+      "nume": "Scaun auto pentru copil",
+      "categorie": "siguranta",
+      "unitate_tarifare": "pe_inchiriere",
+      "descriere": "Scaun omologat, grupa de greutate se stabileste la preluare."
+    },
+    {
+      "id": "lenjerie_pat",
+      "nume": "Set lenjerie de pat",
+      "categorie": "confort",
+      "unitate_tarifare": "pe_inchiriere",
+      "descriere": "Un set complet per persoana: cearsaf, plapuma, perna."
+    },
+    {
+      "id": "set_bucatarie",
+      "nume": "Set bucatarie complet",
+      "categorie": "confort",
+      "unitate_tarifare": "pe_inchiriere",
+      "descriere": "Vase, tacamuri, pahare, ustensile pentru numarul de locuri."
+    },
+    {
+      "id": "mobilier_exterior",
+      "nume": "Masa si scaune de exterior",
+      "categorie": "confort",
+      "unitate_tarifare": "pe_inchiriere",
+      "descriere": "Masa pliabila si scaune de camping."
+    },
+    {
+      "id": "gratar",
+      "nume": "Gratar portabil",
+      "categorie": "confort",
+      "unitate_tarifare": "pe_inchiriere",
+      "descriere": "Gratar pe gaz sau carbune, cu accesorii."
+    },
+    {
+      "id": "kit_iarna",
+      "nume": "Kit de iarna",
+      "categorie": "siguranta",
+      "unitate_tarifare": "pe_inchiriere",
+      "descriere": "Lanturi antiderapante, lopata, cablu incalzit pentru apa."
+    },
+    {
+      "id": "butelie_suplimentara",
+      "nume": "Butelie de gaz suplimentara",
+      "categorie": "echipament",
+      "unitate_tarifare": "pe_inchiriere",
+      "descriere": "A doua butelie, pentru sejururi lungi sau sezon rece."
+    },
+    {
+      "id": "cort_marchiza",
+      "nume": "Cort pentru marchiza",
+      "categorie": "confort",
+      "unitate_tarifare": "pe_inchiriere",
+      "descriere": "Extinde spatiul locuibil sub copertina."
+    },
+    {
+      "id": "sofer_suplimentar",
+      "nume": "Sofer suplimentar",
+      "categorie": "servicii",
+      "unitate_tarifare": "pe_inchiriere",
+      "descriere": "Inregistrarea unui al doilea conducator in contract."
+    },
+    {
+      "id": "animal_companie",
+      "nume": "Animal de companie",
+      "categorie": "servicii",
+      "unitate_tarifare": "pe_inchiriere",
+      "descriere": "Taxa pentru calatoria cu animal de companie (curatenie suplimentara)."
+    },
+    {
+      "id": "predare_alt_punct",
+      "nume": "Predare in alt punct",
+      "categorie": "servicii",
+      "unitate_tarifare": "pe_inchiriere",
+      "descriere": "Returnarea autorulotei in alta locatie decat cea de preluare."
+    },
+    {
+      "id": "wifi_mobil",
+      "nume": "Router WiFi mobil",
+      "categorie": "conectivitate",
+      "unitate_tarifare": "pe_zi",
+      "descriere": "Router 4G cu trafic inclus."
+    },
+    {
+      "id": "reducere_fransiza",
+      "nume": "Reducerea fransizei",
+      "categorie": "asigurare",
+      "unitate_tarifare": "pe_zi",
+      "descriere": "Optiune care micsoreaza suma retinuta din garantie in caz de dauna."
+    }
+  ]
+}

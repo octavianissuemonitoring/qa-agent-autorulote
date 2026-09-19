@@ -1,0 +1,1107 @@
+{
+  "_instructiuni": {
+    "ce_este": "Parcul de autorulote agregat de la partenerii care dau vehicule in management.",
+    "regula_de_aur": "Ce nu scrii aici, agentul nu poate sti.",
+    "moneda": "EUR",
+    "nota_tarif": "tarif_baza_zi = tariful publicat de extrasezon; sezonalitatea se aplica in tarife.json",
+    "_de_confirmat": [
+      "tarife_sezon.sezon si tarife_sezon.varf sunt ESTIMATE (x1.30 si x1.60 fata de extrasezon)",
+      "garantie este ESTIMATA dupa tipul autorulotei",
+      "extraoptiuni: regimul a fost DEDUS din lista 'dotari' - campul 'nota' arata pe ce baza"
+    ],
+    "extraoptiuni": {
+      "structura": "un obiect pe id de extraoptiune, cu regim: inclus | optional | indisponibil",
+      "completitudine": "fiecare vehicul listeaza TOATE extraoptiunile oferite de partenerul lui",
+      "cum_modifici": "schimbi un singur cuvant la 'regim'. 'nota' si 'cantitate' sunt optionale",
+      "diferenta_fata_de_dotari": "'dotari' e text liber, pentru prezentare. 'extraoptiuni' e structurat si decide banii."
+    }
+  },
+  "vehicule": [
+    {
+      "id": "AR-001",
+      "partener_id": "MHC",
+      "nume_comercial": "Adria Matrix Axess 600 SC",
+      "producator": "Adria",
+      "model": "Matrix Axess 600 SC",
+      "an_fabricatie": 2022,
+      "tip": "semi-integral",
+      "numar_inmatriculare": "B-101-CMP",
+      "masa_maxima_autorizata_kg": 3500,
+      "permis_necesar": "B",
+      "lungime_m": 5.99,
+      "inaltime_m": 2.85,
+      "latime_m": 2.3,
+      "locuri_dormit": 4,
+      "locuri_calatorie_omologate": 4,
+      "transmisie": "manuala",
+      "combustibil": "motorina",
+      "consum_mediu_l_100km": 9.5,
+      "capacitate_rezervor_l": 90,
+      "capacitate_apa_curata_l": 120,
+      "capacitate_apa_uzata_l": 90,
+      "dotari": [
+        "panou solar 100W",
+        "aer conditionat cabina",
+        "incalzire Truma pe gaz",
+        "boiler apa calda",
+        "bucatarie cu 3 ochiuri",
+        "frigider 90L",
+        "toaleta cu caseta",
+        "dus interior",
+        "suport 2 biciclete",
+        "copertina exterioara"
+      ],
+      "punct_predare": "Otopeni",
+      "activ": true,
+      "observatii": "Vehicul exemplu pastrat din fisierul initial.",
+      "tarife_sezon": {
+        "extrasezon": 135,
+        "sezon": 176,
+        "varf": 216
+      },
+      "garantie": 1200,
+      "extraoptiuni": {
+        "suport_biciclete": {
+          "regim": "inclus",
+          "nota": "dedus din dotari: \"suport 2 biciclete\"",
+          "cantitate": 2
+        },
+        "scaun_copil": {
+          "regim": "optional"
+        },
+        "lenjerie_pat": {
+          "regim": "optional"
+        },
+        "set_bucatarie": {
+          "regim": "optional"
+        },
+        "mobilier_exterior": {
+          "regim": "optional"
+        },
+        "gratar": {
+          "regim": "optional"
+        },
+        "kit_iarna": {
+          "regim": "optional"
+        },
+        "sofer_suplimentar": {
+          "regim": "optional"
+        },
+        "animal_companie": {
+          "regim": "optional"
+        },
+        "wifi_mobil": {
+          "regim": "optional"
+        }
+      }
+    },
+    {
+      "id": "AR-002",
+      "partener_id": "MHC",
+      "nume_comercial": "Pössl Roadcamp R",
+      "producator": "Pössl",
+      "model": "Roadcamp R",
+      "an_fabricatie": 2023,
+      "tip": "camper van",
+      "numar_inmatriculare": "B-202-CMP",
+      "masa_maxima_autorizata_kg": 3500,
+      "permis_necesar": "B",
+      "lungime_m": 6.36,
+      "inaltime_m": 2.6,
+      "latime_m": 2.05,
+      "locuri_dormit": 2,
+      "locuri_calatorie_omologate": 4,
+      "transmisie": "automata",
+      "combustibil": "motorina",
+      "consum_mediu_l_100km": 8.2,
+      "capacitate_rezervor_l": 75,
+      "capacitate_apa_curata_l": 100,
+      "capacitate_apa_uzata_l": 70,
+      "dotari": [
+        "panou solar 120W",
+        "aer conditionat cabina",
+        "incalzire Truma pe motorina",
+        "boiler apa calda",
+        "bucatarie cu 2 ochiuri",
+        "frigider 70L",
+        "toaleta cu caseta",
+        "dus exterior",
+        "senzori parcare",
+        "camera marsarier"
+      ],
+      "punct_predare": "Otopeni",
+      "activ": true,
+      "observatii": "Ideal pentru cupluri; se conduce ca o duba, usor de parcat in oras.",
+      "tarife_sezon": {
+        "extrasezon": 115,
+        "sezon": 150,
+        "varf": 184
+      },
+      "garantie": 1000,
+      "extraoptiuni": {
+        "suport_biciclete": {
+          "regim": "optional"
+        },
+        "scaun_copil": {
+          "regim": "optional"
+        },
+        "lenjerie_pat": {
+          "regim": "optional"
+        },
+        "set_bucatarie": {
+          "regim": "optional"
+        },
+        "mobilier_exterior": {
+          "regim": "optional"
+        },
+        "gratar": {
+          "regim": "optional"
+        },
+        "kit_iarna": {
+          "regim": "optional"
+        },
+        "sofer_suplimentar": {
+          "regim": "optional"
+        },
+        "animal_companie": {
+          "regim": "optional"
+        },
+        "wifi_mobil": {
+          "regim": "optional"
+        }
+      }
+    },
+    {
+      "id": "GC-001",
+      "partener_id": "GC",
+      "nume_comercial": "Sunlight Integrată I69L Edition",
+      "producator": "Sunlight",
+      "model": "I69L Edition",
+      "an_fabricatie": 2023,
+      "tip": "integral",
+      "numar_inmatriculare": "B-301-GCT",
+      "masa_maxima_autorizata_kg": 3500,
+      "permis_necesar": "B",
+      "lungime_m": 7.41,
+      "inaltime_m": 2.93,
+      "latime_m": 2.32,
+      "locuri_dormit": 4,
+      "locuri_calatorie_omologate": 4,
+      "transmisie": "automata",
+      "combustibil": "motorina",
+      "consum_mediu_l_100km": 10.5,
+      "capacitate_rezervor_l": 90,
+      "capacitate_apa_curata_l": 120,
+      "capacitate_apa_uzata_l": 100,
+      "dotari": [
+        "motor Fiat Ducato 2.3 diesel 170 CP",
+        "panouri fotovoltaice 350W",
+        "acumulator LiFePO4 230Ah",
+        "invertor 1600W",
+        "aer conditionat cabina",
+        "aer conditionat stationar",
+        "incalzire si apa calda Truma 4",
+        "frigider 167L cu congelator separat",
+        "aragaz cu 3 ochiuri",
+        "cuptor pe gaz",
+        "TV Smart",
+        "cabina de dus separata",
+        "camera marsarier",
+        "detector de gaz",
+        "marchiza",
+        "suport biciclete",
+        "garaj depozitare"
+      ],
+      "punct_predare": "Bd. Biruintei 134, Pantelimon, Bucuresti",
+      "activ": true,
+      "observatii": "Categorie EXCLUSIVE/PREMIUM. Tariful de baza este tariful publicat pentru extrasezon; tarifele variaza sezonier.",
+      "tarife_sezon": {
+        "extrasezon": 140,
+        "sezon": 150,
+        "varf": 180
+      },
+      "garantie": 1500,
+      "extraoptiuni": {
+        "suport_biciclete": {
+          "regim": "inclus",
+          "nota": "dedus din dotari: \"suport biciclete\""
+        },
+        "scaun_copil": {
+          "regim": "optional"
+        },
+        "lenjerie_pat": {
+          "regim": "optional"
+        },
+        "set_bucatarie": {
+          "regim": "optional"
+        },
+        "mobilier_exterior": {
+          "regim": "optional"
+        },
+        "gratar": {
+          "regim": "optional"
+        },
+        "kit_iarna": {
+          "regim": "optional"
+        },
+        "butelie_suplimentara": {
+          "regim": "optional"
+        },
+        "cort_marchiza": {
+          "regim": "optional"
+        },
+        "sofer_suplimentar": {
+          "regim": "optional"
+        },
+        "animal_companie": {
+          "regim": "optional"
+        },
+        "predare_alt_punct": {
+          "regim": "optional"
+        },
+        "wifi_mobil": {
+          "regim": "optional"
+        },
+        "reducere_fransiza": {
+          "regim": "optional"
+        }
+      }
+    },
+    {
+      "id": "GC-002",
+      "partener_id": "GC",
+      "nume_comercial": "Hymer Exsis 594",
+      "producator": "Hymer",
+      "model": "Exsis 594",
+      "an_fabricatie": 2023,
+      "tip": "integral",
+      "numar_inmatriculare": "B-302-GCT",
+      "masa_maxima_autorizata_kg": 3500,
+      "permis_necesar": "B",
+      "lungime_m": 6.99,
+      "inaltime_m": 2.8,
+      "latime_m": 2.2,
+      "locuri_dormit": 4,
+      "locuri_calatorie_omologate": 4,
+      "transmisie": "automata",
+      "combustibil": "motorina",
+      "consum_mediu_l_100km": 10.0,
+      "capacitate_rezervor_l": 90,
+      "capacitate_apa_curata_l": 120,
+      "capacitate_apa_uzata_l": 100,
+      "dotari": [
+        "motor Fiat Ducato 2.3 diesel 170 CP",
+        "panouri fotovoltaice 350W",
+        "acumulator LiFePO4 230Ah",
+        "invertor 2200W",
+        "aer conditionat cabina",
+        "incalzire si apa calda Truma 4",
+        "frigider 160L cu congelator separat",
+        "aragaz cu 3 ochiuri",
+        "cuptor pe gaz",
+        "TV Smart",
+        "cabina de dus separata",
+        "camera marsarier",
+        "detector de gaz",
+        "marchiza",
+        "suport biciclete",
+        "garaj depozitare"
+      ],
+      "punct_predare": "Bd. Biruintei 134, Pantelimon, Bucuresti",
+      "activ": true,
+      "observatii": "Categorie EXCLUSIVE/PREMIUM. Tariful de baza este tariful publicat pentru extrasezon; tarifele variaza sezonier.",
+      "tarife_sezon": {
+        "extrasezon": 140,
+        "sezon": 182,
+        "varf": 224
+      },
+      "garantie": 1500,
+      "extraoptiuni": {
+        "suport_biciclete": {
+          "regim": "inclus",
+          "nota": "dedus din dotari: \"suport biciclete\""
+        },
+        "scaun_copil": {
+          "regim": "optional"
+        },
+        "lenjerie_pat": {
+          "regim": "optional"
+        },
+        "set_bucatarie": {
+          "regim": "optional"
+        },
+        "mobilier_exterior": {
+          "regim": "optional"
+        },
+        "gratar": {
+          "regim": "optional"
+        },
+        "kit_iarna": {
+          "regim": "optional"
+        },
+        "butelie_suplimentara": {
+          "regim": "optional"
+        },
+        "cort_marchiza": {
+          "regim": "optional"
+        },
+        "sofer_suplimentar": {
+          "regim": "optional"
+        },
+        "animal_companie": {
+          "regim": "optional"
+        },
+        "predare_alt_punct": {
+          "regim": "optional"
+        },
+        "wifi_mobil": {
+          "regim": "optional"
+        },
+        "reducere_fransiza": {
+          "regim": "optional"
+        }
+      }
+    },
+    {
+      "id": "GC-003",
+      "partener_id": "GC",
+      "nume_comercial": "Pilote 726FC",
+      "producator": "Pilote",
+      "model": "726FC",
+      "an_fabricatie": 2025,
+      "tip": "semi-integral",
+      "numar_inmatriculare": "B-303-GCT",
+      "masa_maxima_autorizata_kg": 3500,
+      "permis_necesar": "B",
+      "lungime_m": 7.26,
+      "inaltime_m": 2.9,
+      "latime_m": 2.33,
+      "locuri_dormit": 4,
+      "locuri_calatorie_omologate": 4,
+      "transmisie": "automata",
+      "combustibil": "motorina",
+      "consum_mediu_l_100km": 10.5,
+      "capacitate_rezervor_l": 90,
+      "capacitate_apa_curata_l": 120,
+      "capacitate_apa_uzata_l": 100,
+      "dotari": [
+        "motor Fiat Ducato 2.2 diesel 140 CP",
+        "cutie automata 8+1 trepte",
+        "panouri fotovoltaice 400W",
+        "acumulator LiFePO4 280Ah",
+        "invertor 1600W",
+        "aer conditionat cabina",
+        "aer conditionat stationar",
+        "incalzire Truma",
+        "frigider trivalent 140L",
+        "aragaz cu 2 ochiuri",
+        "TV Smart cu Netflix",
+        "camera marsarier",
+        "pat king-size 1.5 x 2.0 m",
+        "suport biciclete",
+        "garaj mare"
+      ],
+      "punct_predare": "Bd. Biruintei 134, Pantelimon, Bucuresti",
+      "activ": true,
+      "observatii": "Categorie PREMIUM. Tariful de baza este tariful publicat pentru extrasezon; tarifele variaza sezonier.",
+      "tarife_sezon": {
+        "extrasezon": 140,
+        "sezon": 182,
+        "varf": 224
+      },
+      "garantie": 1200,
+      "extraoptiuni": {
+        "suport_biciclete": {
+          "regim": "inclus",
+          "nota": "dedus din dotari: \"suport biciclete\""
+        },
+        "scaun_copil": {
+          "regim": "optional"
+        },
+        "lenjerie_pat": {
+          "regim": "optional"
+        },
+        "set_bucatarie": {
+          "regim": "optional"
+        },
+        "mobilier_exterior": {
+          "regim": "optional"
+        },
+        "gratar": {
+          "regim": "optional"
+        },
+        "kit_iarna": {
+          "regim": "optional"
+        },
+        "butelie_suplimentara": {
+          "regim": "optional"
+        },
+        "cort_marchiza": {
+          "regim": "indisponibil",
+          "nota": "lipseste din dotari: marchiza sau copertina"
+        },
+        "sofer_suplimentar": {
+          "regim": "optional"
+        },
+        "animal_companie": {
+          "regim": "optional"
+        },
+        "predare_alt_punct": {
+          "regim": "optional"
+        },
+        "wifi_mobil": {
+          "regim": "optional"
+        },
+        "reducere_fransiza": {
+          "regim": "optional"
+        }
+      }
+    },
+    {
+      "id": "GC-004",
+      "partener_id": "GC",
+      "nume_comercial": "XGO 35G - NEW 2026",
+      "producator": "XGO",
+      "model": "35G",
+      "an_fabricatie": 2026,
+      "tip": "alcov",
+      "numar_inmatriculare": "B-304-GCT",
+      "masa_maxima_autorizata_kg": 3500,
+      "permis_necesar": "B",
+      "lungime_m": 6.99,
+      "inaltime_m": 3.05,
+      "latime_m": 2.34,
+      "locuri_dormit": 6,
+      "locuri_calatorie_omologate": 6,
+      "transmisie": "manuala",
+      "combustibil": "motorina",
+      "consum_mediu_l_100km": 11.5,
+      "capacitate_rezervor_l": 90,
+      "capacitate_apa_curata_l": 100,
+      "capacitate_apa_uzata_l": 100,
+      "dotari": [
+        "motor Fiat Ducato 2.2 diesel 140 CP",
+        "cutie manuala 6+1 trepte",
+        "aer conditionat cabina",
+        "aer conditionat stationar",
+        "cruise control",
+        "cabina de dus separata",
+        "marchiza 4.5 m",
+        "aragaz cu 3 ochiuri",
+        "frigider 97L",
+        "doua rezervoare GPL",
+        "bucatarie complet echipata",
+        "garaj mare",
+        "pat alcov 140 x 220 cm",
+        "pat living 129 x 189 cm",
+        "pat spate 136 x 220 cm"
+      ],
+      "punct_predare": "Bd. Biruintei 134, Pantelimon, Bucuresti",
+      "activ": true,
+      "observatii": "Model NEW 2026. Tariful de baza este tariful publicat pentru extrasezon; tarifele variaza sezonier.",
+      "tarife_sezon": {
+        "extrasezon": 110,
+        "sezon": 143,
+        "varf": 176
+      },
+      "garantie": 1300,
+      "extraoptiuni": {
+        "suport_biciclete": {
+          "regim": "optional"
+        },
+        "scaun_copil": {
+          "regim": "optional"
+        },
+        "lenjerie_pat": {
+          "regim": "optional"
+        },
+        "set_bucatarie": {
+          "regim": "optional"
+        },
+        "mobilier_exterior": {
+          "regim": "optional"
+        },
+        "gratar": {
+          "regim": "optional"
+        },
+        "kit_iarna": {
+          "regim": "optional"
+        },
+        "butelie_suplimentara": {
+          "regim": "optional"
+        },
+        "cort_marchiza": {
+          "regim": "optional"
+        },
+        "sofer_suplimentar": {
+          "regim": "optional"
+        },
+        "animal_companie": {
+          "regim": "optional"
+        },
+        "predare_alt_punct": {
+          "regim": "optional"
+        },
+        "wifi_mobil": {
+          "regim": "optional"
+        },
+        "reducere_fransiza": {
+          "regim": "optional"
+        }
+      }
+    },
+    {
+      "id": "GC-005",
+      "partener_id": "GC",
+      "nume_comercial": "XGO 69P - NEW 2026",
+      "producator": "XGO",
+      "model": "69P",
+      "an_fabricatie": 2026,
+      "tip": "semi-integral",
+      "numar_inmatriculare": "B-305-GCT",
+      "masa_maxima_autorizata_kg": 3500,
+      "permis_necesar": "B",
+      "lungime_m": 7.45,
+      "inaltime_m": 2.95,
+      "latime_m": 2.35,
+      "locuri_dormit": 3,
+      "locuri_calatorie_omologate": 5,
+      "transmisie": "manuala",
+      "combustibil": "motorina",
+      "consum_mediu_l_100km": 10.8,
+      "capacitate_rezervor_l": 90,
+      "capacitate_apa_curata_l": 100,
+      "capacitate_apa_uzata_l": 100,
+      "dotari": [
+        "motor Fiat Ducato 2.2 diesel 140 CP",
+        "cutie manuala 6+1 trepte",
+        "aer conditionat cabina",
+        "cruise control",
+        "cabina de dus separata",
+        "marchiza 4.5 m",
+        "aragaz cu 3 ochiuri",
+        "frigider 97L",
+        "doua rezervoare GPL",
+        "bucatarie complet echipata",
+        "garaj mare",
+        "pat living 107 x 220 cm",
+        "pat spate 140 x 190 cm"
+      ],
+      "punct_predare": "Bd. Biruintei 134, Pantelimon, Bucuresti",
+      "activ": true,
+      "observatii": "Model NEW 2026. Tariful de baza este tariful publicat pentru extrasezon; tarifele variaza sezonier.",
+      "tarife_sezon": {
+        "extrasezon": 110,
+        "sezon": 143,
+        "varf": 176
+      },
+      "garantie": 1200,
+      "extraoptiuni": {
+        "suport_biciclete": {
+          "regim": "optional"
+        },
+        "scaun_copil": {
+          "regim": "optional"
+        },
+        "lenjerie_pat": {
+          "regim": "optional"
+        },
+        "set_bucatarie": {
+          "regim": "optional"
+        },
+        "mobilier_exterior": {
+          "regim": "optional"
+        },
+        "gratar": {
+          "regim": "optional"
+        },
+        "kit_iarna": {
+          "regim": "optional"
+        },
+        "butelie_suplimentara": {
+          "regim": "optional"
+        },
+        "cort_marchiza": {
+          "regim": "optional"
+        },
+        "sofer_suplimentar": {
+          "regim": "optional"
+        },
+        "animal_companie": {
+          "regim": "optional"
+        },
+        "predare_alt_punct": {
+          "regim": "optional"
+        },
+        "wifi_mobil": {
+          "regim": "optional"
+        },
+        "reducere_fransiza": {
+          "regim": "optional"
+        }
+      }
+    },
+    {
+      "id": "GC-006",
+      "partener_id": "GC",
+      "nume_comercial": "XGO 99P - NEW 2026",
+      "producator": "XGO",
+      "model": "99P",
+      "an_fabricatie": 2026,
+      "tip": "semi-integral",
+      "numar_inmatriculare": "B-306-GCT",
+      "masa_maxima_autorizata_kg": 3500,
+      "permis_necesar": "B",
+      "lungime_m": 7.45,
+      "inaltime_m": 2.95,
+      "latime_m": 2.35,
+      "locuri_dormit": 5,
+      "locuri_calatorie_omologate": 4,
+      "transmisie": "manuala",
+      "combustibil": "motorina",
+      "consum_mediu_l_100km": 10.8,
+      "capacitate_rezervor_l": 90,
+      "capacitate_apa_curata_l": 100,
+      "capacitate_apa_uzata_l": 100,
+      "dotari": [
+        "motor Fiat Ducato 2.2 diesel 140 CP",
+        "cutie manuala 6+1 trepte",
+        "aer conditionat cabina",
+        "cruise control",
+        "cabina de dus separata",
+        "marchiza 4.5 m",
+        "aragaz cu 3 ochiuri",
+        "frigider 97L",
+        "doua rezervoare GPL",
+        "bucatarie complet echipata",
+        "garaj mare",
+        "pat living 105 x 220 cm",
+        "pat lift 122 x 200 cm",
+        "doua paturi spate"
+      ],
+      "punct_predare": "Bd. Biruintei 134, Pantelimon, Bucuresti",
+      "activ": true,
+      "observatii": "Model NEW 2026. Tariful de baza este tariful publicat pentru extrasezon; tarifele variaza sezonier.",
+      "tarife_sezon": {
+        "extrasezon": 110,
+        "sezon": 143,
+        "varf": 176
+      },
+      "garantie": 1200,
+      "extraoptiuni": {
+        "suport_biciclete": {
+          "regim": "optional"
+        },
+        "scaun_copil": {
+          "regim": "optional"
+        },
+        "lenjerie_pat": {
+          "regim": "optional"
+        },
+        "set_bucatarie": {
+          "regim": "optional"
+        },
+        "mobilier_exterior": {
+          "regim": "optional"
+        },
+        "gratar": {
+          "regim": "optional"
+        },
+        "kit_iarna": {
+          "regim": "optional"
+        },
+        "butelie_suplimentara": {
+          "regim": "optional"
+        },
+        "cort_marchiza": {
+          "regim": "optional"
+        },
+        "sofer_suplimentar": {
+          "regim": "optional"
+        },
+        "animal_companie": {
+          "regim": "optional"
+        },
+        "predare_alt_punct": {
+          "regim": "optional"
+        },
+        "wifi_mobil": {
+          "regim": "optional"
+        },
+        "reducere_fransiza": {
+          "regim": "optional"
+        }
+      }
+    },
+    {
+      "id": "GC-007",
+      "partener_id": "GC",
+      "nume_comercial": "Ahorn Canada AD",
+      "producator": "Ahorn Camp",
+      "model": "Canada AD",
+      "an_fabricatie": 2022,
+      "tip": "alcov",
+      "numar_inmatriculare": "B-307-GCT",
+      "masa_maxima_autorizata_kg": 3500,
+      "permis_necesar": "B",
+      "lungime_m": 7.32,
+      "inaltime_m": 3.06,
+      "latime_m": 2.37,
+      "locuri_dormit": 6,
+      "locuri_calatorie_omologate": 6,
+      "transmisie": "automata",
+      "combustibil": "motorina",
+      "consum_mediu_l_100km": 11.5,
+      "capacitate_rezervor_l": 80,
+      "capacitate_apa_curata_l": 85,
+      "capacitate_apa_uzata_l": 130,
+      "dotari": [
+        "motor Renault Master 2.3 diesel 170 CP",
+        "panouri fotovoltaice 430W",
+        "acumulator Victron Energy AGM 110Ah",
+        "invertor 500W la cerere",
+        "aer conditionat cabina",
+        "aer conditionat stationar",
+        "incalzire si apa calda Truma 4",
+        "frigider 147L",
+        "aragaz cu 3 ochiuri",
+        "Smart TV cu Wi-Fi si Netflix",
+        "cabina de dus separata",
+        "camera marsarier",
+        "detector de gaz",
+        "marchiza",
+        "sistem de alarma",
+        "garaj depozitare"
+      ],
+      "punct_predare": "Bd. Biruintei 134, Pantelimon, Bucuresti",
+      "activ": true,
+      "observatii": "Pagina contine si o a doua fisa tehnica pentru Canada AD cu transmisie manuala si motor de 145 CP; aceasta inregistrare foloseste specificatiile primei fise, automate. Tariful de baza este cel de extrasezon.",
+      "tarife_sezon": {
+        "extrasezon": 140,
+        "sezon": 182,
+        "varf": 224
+      },
+      "garantie": 1300,
+      "extraoptiuni": {
+        "suport_biciclete": {
+          "regim": "optional"
+        },
+        "scaun_copil": {
+          "regim": "optional"
+        },
+        "lenjerie_pat": {
+          "regim": "optional"
+        },
+        "set_bucatarie": {
+          "regim": "optional"
+        },
+        "mobilier_exterior": {
+          "regim": "optional"
+        },
+        "gratar": {
+          "regim": "optional"
+        },
+        "kit_iarna": {
+          "regim": "optional"
+        },
+        "butelie_suplimentara": {
+          "regim": "optional"
+        },
+        "cort_marchiza": {
+          "regim": "optional"
+        },
+        "sofer_suplimentar": {
+          "regim": "optional"
+        },
+        "animal_companie": {
+          "regim": "optional"
+        },
+        "predare_alt_punct": {
+          "regim": "optional"
+        },
+        "wifi_mobil": {
+          "regim": "inclus",
+          "nota": "dedus din dotari: \"Smart TV cu Wi-Fi si Netflix\""
+        },
+        "reducere_fransiza": {
+          "regim": "optional"
+        }
+      }
+    },
+    {
+      "id": "GC-008",
+      "partener_id": "GC",
+      "nume_comercial": "Ahorn Alaska TQ",
+      "producator": "Ahorn Camp",
+      "model": "Alaska TQ",
+      "an_fabricatie": 2022,
+      "tip": "semi-integral",
+      "numar_inmatriculare": "B-308-GCT",
+      "masa_maxima_autorizata_kg": 3500,
+      "permis_necesar": "B",
+      "lungime_m": 7.47,
+      "inaltime_m": 2.97,
+      "latime_m": 2.34,
+      "locuri_dormit": 4,
+      "locuri_calatorie_omologate": 4,
+      "transmisie": "manuala",
+      "combustibil": "motorina",
+      "consum_mediu_l_100km": 10.5,
+      "capacitate_rezervor_l": 80,
+      "capacitate_apa_curata_l": 85,
+      "capacitate_apa_uzata_l": 100,
+      "dotari": [
+        "motor Renault Master 2.3 diesel 145 CP",
+        "cutie manuala 6+1 trepte",
+        "panouri fotovoltaice 430W",
+        "acumulator Victron Energy AGM 110Ah",
+        "invertor 500W la cerere",
+        "aer conditionat cabina",
+        "incalzire si apa calda Truma 4",
+        "frigider 147L",
+        "aragaz cu 3 ochiuri",
+        "cabina de dus separata",
+        "camera marsarier",
+        "detector de gaz",
+        "marchiza",
+        "sistem de alarma",
+        "garaj depozitare"
+      ],
+      "punct_predare": "Bd. Biruintei 134, Pantelimon, Bucuresti",
+      "activ": true,
+      "observatii": "Tariful de baza este tariful publicat pentru extrasezon; tarifele variaza sezonier.",
+      "tarife_sezon": {
+        "extrasezon": 100,
+        "sezon": 130,
+        "varf": 160
+      },
+      "garantie": 1200,
+      "extraoptiuni": {
+        "suport_biciclete": {
+          "regim": "optional"
+        },
+        "scaun_copil": {
+          "regim": "optional"
+        },
+        "lenjerie_pat": {
+          "regim": "optional"
+        },
+        "set_bucatarie": {
+          "regim": "optional"
+        },
+        "mobilier_exterior": {
+          "regim": "optional"
+        },
+        "gratar": {
+          "regim": "optional"
+        },
+        "kit_iarna": {
+          "regim": "optional"
+        },
+        "butelie_suplimentara": {
+          "regim": "optional"
+        },
+        "cort_marchiza": {
+          "regim": "optional"
+        },
+        "sofer_suplimentar": {
+          "regim": "optional"
+        },
+        "animal_companie": {
+          "regim": "optional"
+        },
+        "predare_alt_punct": {
+          "regim": "optional"
+        },
+        "wifi_mobil": {
+          "regim": "optional"
+        },
+        "reducere_fransiza": {
+          "regim": "optional"
+        }
+      }
+    },
+    {
+      "id": "GC-009",
+      "partener_id": "GC",
+      "nume_comercial": "Rimor Superbrig",
+      "producator": "Rimor",
+      "model": "Superbrig",
+      "an_fabricatie": 2021,
+      "tip": "alcov",
+      "numar_inmatriculare": "B-309-GCT",
+      "masa_maxima_autorizata_kg": 3500,
+      "permis_necesar": "B",
+      "lungime_m": 7.17,
+      "inaltime_m": 3.08,
+      "latime_m": 2.34,
+      "locuri_dormit": 5,
+      "locuri_calatorie_omologate": 5,
+      "transmisie": "manuala",
+      "combustibil": "motorina",
+      "consum_mediu_l_100km": 11.5,
+      "capacitate_rezervor_l": 80,
+      "capacitate_apa_curata_l": 100,
+      "capacitate_apa_uzata_l": 100,
+      "dotari": [
+        "motor Renault Master 2.3 diesel 130 CP",
+        "cutie manuala 6+1 trepte",
+        "panou solar 170W",
+        "baterie 130Ah",
+        "MPPT Victron Energy 30A",
+        "aer conditionat cabina",
+        "aer conditionat stationar",
+        "marchiza 4.5 m",
+        "cabina de dus separata",
+        "aragaz cu 3 ochiuri",
+        "cuptor",
+        "frigider trivalent 147L",
+        "TV Smart cu Netflix",
+        "doua rezervoare GPL de 40L",
+        "bucatarie complet echipata",
+        "garaj mare"
+      ],
+      "punct_predare": "Bd. Biruintei 134, Pantelimon, Bucuresti",
+      "activ": true,
+      "observatii": "Tariful de baza este tariful publicat pentru extrasezon; tarifele variaza sezonier.",
+      "tarife_sezon": {
+        "extrasezon": 100,
+        "sezon": 130,
+        "varf": 160
+      },
+      "garantie": 1300,
+      "extraoptiuni": {
+        "suport_biciclete": {
+          "regim": "optional"
+        },
+        "scaun_copil": {
+          "regim": "optional"
+        },
+        "lenjerie_pat": {
+          "regim": "optional"
+        },
+        "set_bucatarie": {
+          "regim": "optional"
+        },
+        "mobilier_exterior": {
+          "regim": "optional"
+        },
+        "gratar": {
+          "regim": "optional"
+        },
+        "kit_iarna": {
+          "regim": "optional"
+        },
+        "butelie_suplimentara": {
+          "regim": "optional"
+        },
+        "cort_marchiza": {
+          "regim": "optional"
+        },
+        "sofer_suplimentar": {
+          "regim": "optional"
+        },
+        "animal_companie": {
+          "regim": "optional"
+        },
+        "predare_alt_punct": {
+          "regim": "optional"
+        },
+        "wifi_mobil": {
+          "regim": "optional"
+        },
+        "reducere_fransiza": {
+          "regim": "optional"
+        }
+      }
+    },
+    {
+      "id": "GC-010",
+      "partener_id": "GC",
+      "nume_comercial": "Baron Compact 539",
+      "producator": "Elnagh",
+      "model": "Baron Compact 539",
+      "an_fabricatie": 2023,
+      "tip": "semi-integral",
+      "numar_inmatriculare": "B-310-GCT",
+      "masa_maxima_autorizata_kg": 3500,
+      "permis_necesar": "B",
+      "lungime_m": 6.69,
+      "inaltime_m": 2.95,
+      "latime_m": 2.35,
+      "locuri_dormit": 4,
+      "locuri_calatorie_omologate": 4,
+      "transmisie": "automata",
+      "combustibil": "motorina",
+      "consum_mediu_l_100km": 10.5,
+      "capacitate_rezervor_l": 70,
+      "capacitate_apa_curata_l": 100,
+      "capacitate_apa_uzata_l": 100,
+      "dotari": [
+        "motor Ford Transit 2.0 diesel 130 CP",
+        "aer conditionat cabina",
+        "incalzire Truma",
+        "frigider 140L",
+        "cabina de dus separata",
+        "camera marsarier",
+        "detector de gaz",
+        "marchiza",
+        "sistem de alarma",
+        "pregatita pentru iarna"
+      ],
+      "punct_predare": "Bd. Biruintei 134, Pantelimon, Bucuresti",
+      "activ": true,
+      "observatii": "Tariful de baza este tariful publicat pentru extrasezon; tarifele variaza sezonier. Producatorul Elnagh este dedus din denumirea comerciala Baron Compact. Anul, dimensiunile, consumul si capacitatile rezervoarelor sunt valori estimate pentru testare.",
+      "tarife_sezon": {
+        "extrasezon": 140,
+        "sezon": 182,
+        "varf": 224
+      },
+      "garantie": 1200,
+      "extraoptiuni": {
+        "suport_biciclete": {
+          "regim": "optional"
+        },
+        "scaun_copil": {
+          "regim": "optional"
+        },
+        "lenjerie_pat": {
+          "regim": "optional"
+        },
+        "set_bucatarie": {
+          "regim": "optional"
+        },
+        "mobilier_exterior": {
+          "regim": "optional"
+        },
+        "gratar": {
+          "regim": "optional"
+        },
+        "kit_iarna": {
+          "regim": "optional"
+        },
+        "butelie_suplimentara": {
+          "regim": "optional"
+        },
+        "cort_marchiza": {
+          "regim": "optional"
+        },
+        "sofer_suplimentar": {
+          "regim": "optional"
+        },
+        "animal_companie": {
+          "regim": "optional"
+        },
+        "predare_alt_punct": {
+          "regim": "optional"
+        },
+        "wifi_mobil": {
+          "regim": "optional"
+        },
+        "reducere_fransiza": {
+          "regim": "optional"
+        }
+      }
+    }
+  ]
+}

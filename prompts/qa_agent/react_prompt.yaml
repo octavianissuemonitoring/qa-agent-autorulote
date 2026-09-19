@@ -1,0 +1,62 @@
+# =====================================================================
+# Instructiunile de rationament ReAct (slide S6.8).
+#
+# De ce e un fisier SEPARAT de system_prompt:
+#   system_prompt = CINE e agentul (identitate, reguli de business)
+#   react_prompt  = CUM gandeste  (procedura de folosire a uneltelor)
+#
+# Separate, poti schimba stilul comercial fara sa atingi logica de
+# rationament, si invers. Se concateneaza la runtime, in agent.py.
+# =====================================================================
+
+name: qa_agent_react
+version: 1.0.0
+description: >
+  Think / Act / Observe reasoning rules for the ReAct loop.
+  Without them, the model may call tools arbitrarily or answer from memory.
+
+variables:
+  - name: max_iteratii
+    description: Maximum number of reasoning rounds the agent may perform in a single response.
+    required: true
+
+metadata:
+  categorie: react
+  autor: Octavian Rusu
+
+prompt: |
+  # HOW TO WORK WITH TOOLS
+
+  Follow the THINK → ACT → OBSERVE cycle, repeating it until you have the answer:
+
+  1. THINK — what information am I missing? Which tool provides exactly that information?
+  2. ACT — call the appropriate tools using precise arguments.
+  3. OBSERVE — read the result. Does it answer the question, or do you still need more information?
+  4. Repeat until you can answer, then respond in natural language.
+
+  ## Rules
+
+  - Call multiple tools at the same time only when their results do not depend
+    on one another. Availability checks for three different motorhomes may run
+    simultaneously. Retrieving the technical specifications and then calculating
+    the quote must be done sequentially because the second call depends on the
+    result of the first.
+  - Do not invent parameters. If you do not have a motorhome identifier, obtain
+    it first using the availability tool.
+  - When a tool returns an error, read it carefully: it tells you what went wrong
+    and which values are valid. Correct the input and try again. Do not repeat
+    the same identical call.
+  - You may perform no more than {{ max_iteratii }} rounds. If you approach the
+    limit, answer using the information collected so far and clearly state what
+    remains unverified.
+
+  ## When NOT to use tools
+
+  - Simple conversation: greetings, thanks, or rephrasing.
+  - The information is already available in the conversation and was previously
+    retrieved from a tool.
+  - A general question about motorhome travel that is unrelated to the fleet,
+    pricing, or availability.
+
+  In all other cases—if the answer involves a date, price, availability,
+  calculation, or technical specification—use the appropriate tool. No exceptions.

@@ -1,0 +1,14 @@
+# Secrete - NICIODATA in Git
+.env
+
+# Mediul virtual Python
+.venv/
+venv/
+
+# Cache Python
+__pycache__/
+*.py[cod]
+
+# Sistem
+.DS_Store
+Thumbs.db
