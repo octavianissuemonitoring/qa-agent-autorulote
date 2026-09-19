@@ -87,6 +87,20 @@ macOS (cu mediul activat):
 python main.py
 ```
 
+## Plasele de siguranță (S6.7)
+
+Patru limite, toate reglabile din `.env`:
+
+| Setare | Implicit | Ce oprește |
+|---|---|---|
+| `MAX_ITERATIONS` | 8 | câte runde Think→Act→Observe are voie o întrebare |
+| `MAX_TOKENS_TURA` | 50000 | tokenii consumați de toată tura (costuri) |
+| `TOOL_TIMEOUT` | 10 s | cât are voie să dureze o unealtă |
+| `TOOL_MAX_ERORI` | 3 | după atâtea erori, unealta nu mai e apelată (circuit breaker) |
+
+La oricare dintre ele, agentul nu crapă: mai cere modelului un răspuns final,
+fără unelte, din informațiile strânse până atunci (`_raspuns_final_fortat()`).
+
 ## Modelele AI: active și inactive
 
 Modelele se definesc în `.env`, ca `provider/nume_model`:

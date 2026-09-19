@@ -65,8 +65,17 @@ OLLAMA_BASE_URL = _text("OLLAMA_BASE_URL", "http://localhost:11434")
 TEMPERATURE = _zecimal("TEMPERATURE", 0.0)
 MAX_TOKENS = _numar("MAX_TOKENS", 2048)
 
-# --- ReAct -----------------------------------------------------------
+# --- ReAct: cele 4 plase de siguranta din S6.7 -----------------------
+# 1. cate runde GANDESTE->ACTIONEAZA->OBSERVA are voie o tura
 MAX_ITERATIONS = _numar("MAX_ITERATIONS", 8)
+# 2. plafon de tokeni pe TOATA tura (intrare + iesire), pentru costuri.
+#    MAX_TOKENS de mai sus limiteaza un singur raspuns; asta limiteaza sirul.
+MAX_TOKENS_TURA = _numar("MAX_TOKENS_TURA", 50_000)
+# 3. cat are voie sa dureze UN tool. Acum uneltele citesc JSON local si
+#    dureaza sub o milisecunda, dar la primul API extern conteaza.
+TOOL_TIMEOUT = _zecimal("TOOL_TIMEOUT", 10.0)
+# 4. circuit breaker: dupa atatea erori intr-o tura, tool-ul nu mai e apelat
+TOOL_MAX_ERORI = _numar("TOOL_MAX_ERORI", 3)
 
 # --- Identitatea agentului (ajunge in system prompt prin Jinja2) ------
 NUME_COMPANIE = _text("NUME_COMPANIE", "CamperHub")
@@ -122,6 +131,8 @@ def descrie(model_curent=None) -> str:
         f"modele active: {len(active)} din {len(modele.catalog())} definite (/modele)\n"
         f"temperature: {temp} | max_tokens: {MAX_TOKENS} | "
         f"max_iteratii ReAct: {MAX_ITERATIONS}\n"
+        f"limite tura: {MAX_TOKENS_TURA} tokeni | tool: {TOOL_TIMEOUT}s, "
+        f"max {TOOL_MAX_ERORI} erori\n"
         f"{tracing}"
     )
 

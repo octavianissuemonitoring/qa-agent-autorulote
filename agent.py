@@ -21,7 +21,10 @@ Functiile din slide-urile S6.4 si S6.5 sunt la nivel de modul, sub text_din():
 """
 
 import asyncio
+import contextvars
+import threading
 import uuid
+from concurrent.futures import Executor, Future
 from datetime import datetime
 from typing import Any, Iterator
 from zoneinfo import ZoneInfo
@@ -93,16 +96,62 @@ def execute_tool(tool_call: dict) -> str:
     return ToolWrapper.call(name, args)
 
 
+class _ExecutorDaemon(Executor):
+    """
+    Ruleaza fiecare tool intr-un thread "daemon", adica unul pe care Python
+    il abandoneaza la inchiderea programului.
+
+    De ce nu ThreadPoolExecutor (nici cel implicit al asyncio): pool-urile
+    obisnuite ASTEAPTA thread-urile la iesire. Un tool blocat ar tine agentul
+    pe loc exact cat incercam sa evitam prin timeout - doar ca la final.
+    """
+
+    def submit(self, fn, *args, **kwargs) -> Future:
+        viitor: Future = Future()
+
+        def ruleaza() -> None:
+            if not viitor.set_running_or_notify_cancel():
+                return
+            try:
+                viitor.set_result(fn(*args, **kwargs))
+            except BaseException as e:  # noqa: BLE001 - il predam apelantului
+                viitor.set_exception(e)
+
+        threading.Thread(target=ruleaza, name="tool", daemon=True).start()
+        return viitor
+
+
+_POOL = _ExecutorDaemon()
+
+
 async def execute_tool_async(tool_call: dict) -> dict:
     """
     S6.5 - ruleaza tool-ul (sincron) intr-un thread separat, ca sa nu
     blocheze celelalte tool-uri din aceeasi runda.
 
-    asyncio.to_thread() copiaza contextul curent in thread, deci executia
-    ramane legata de trace-ul LangSmith al turei.
+    S6.7, "Timeout per tool": daca tool-ul depaseste TOOL_TIMEOUT secunde,
+    nu il mai asteptam. Thread-ul ramane sa se termine singur in fundal -
+    Python nu poate opri un thread din afara - dar agentul merge mai departe
+    si spune modelului ce s-a intamplat.
+
+    Contextul curent se copiaza in thread, deci executia ramane legata de
+    trace-ul LangSmith al turei.
     """
-    rezultat = await asyncio.to_thread(execute_tool, tool_call)
-    return {"tool_call_id": tool_call.get("id", tool_call.get("name", "")), "content": str(rezultat)}
+    nume = tool_call.get("name", "")
+    id_apel = tool_call.get("id", nume)
+    context = contextvars.copy_context()
+    viitor = asyncio.get_running_loop().run_in_executor(
+        _POOL, context.run, execute_tool, tool_call
+    )
+    try:
+        rezultat = await asyncio.wait_for(viitor, timeout=config.TOOL_TIMEOUT)
+    except (asyncio.TimeoutError, TimeoutError):
+        rezultat = (
+            f"EROARE: tool-ul '{nume}' nu a raspuns in {config.TOOL_TIMEOUT:g} secunde "
+            f"si a fost abandonat. Incearca alti parametri sau raspunde clientului "
+            f"cu informatiile pe care le ai deja."
+        )
+    return {"tool_call_id": id_apel, "content": str(rezultat)}
 
 
 async def execute_all_tools(tool_calls: list) -> list:
@@ -330,6 +379,12 @@ class QAAgent:
         semnaturi_vazute: set[str] = set()
         repetari = 0
 
+        # Circuit breaker (S6.7): cate erori a dat fiecare tool in tura asta.
+        # Dupa TOOL_MAX_ERORI, nu il mai apelam deloc - un tool stricat nu are
+        # voie sa consume toate rundele.
+        erori_per_tool: dict[str, int] = {}
+        apeluri_blocate = 0
+
         for iteratie in range(1, self.max_iteratii + 1):
             self._spune("GANDESTE", f"runda {iteratie}/{self.max_iteratii}")
 
@@ -371,7 +426,15 @@ class QAAgent:
                 relevanti = {k: v for k, v in sorted(argumente.items()) if v is not None}
                 semnatura = f"{nume}:{relevanti}"
 
-                if semnatura in semnaturi_vazute:
+                if erori_per_tool.get(nume, 0) >= config.TOOL_MAX_ERORI:
+                    apeluri_blocate += 1
+                    self._spune("  X", f"{nume} oprit dupa {config.TOOL_MAX_ERORI} erori")
+                    rezultate[i] = (
+                        f"EROARE: tool-ul '{nume}' a esuat de {config.TOOL_MAX_ERORI} ori "
+                        f"in aceasta conversatie si nu mai este apelat. Raspunde clientului "
+                        f"cu informatiile pe care le ai si spune-i ce nu ai putut verifica."
+                    )
+                elif semnatura in semnaturi_vazute:
                     repetari += 1
                     self._spune("  !!", f"{nume} cerut din nou cu aceiasi parametri")
                     rezultate[i] = (
@@ -390,8 +453,12 @@ class QAAgent:
                 if len(de_executat) > 1:
                     self._spune("  ||", f"{len(de_executat)} unelte executate in paralel")
                 executate = asyncio.run(execute_all_tools([apel for _, apel in de_executat]))
-                for (i, _), rezultat in zip(de_executat, executate):
+                for (i, apel), rezultat in zip(de_executat, executate):
                     rezultate[i] = rezultat["content"]
+                    # Tinem socoteala erorilor pentru circuit breaker (S6.7).
+                    if rezultat["content"].startswith("EROARE"):
+                        nume_tool = apel.get("name", "")
+                        erori_per_tool[nume_tool] = erori_per_tool.get(nume_tool, 0) + 1
 
             # --- OBSERVE: trimitem rezultatele inapoi la LLM ----------------
             for i, apel in enumerate(apeluri):
@@ -411,27 +478,28 @@ class QAAgent:
 
             # --- Iesire fortata din bucla ---------------------------------
             # Daca modelul a repetat de doua ori, nu se mai desprinde singur.
-            # Il apelam o ultima data FARA unelte: neavand ce sa ceara, e
-            # obligat sa formuleze raspunsul din ce a strans deja.
             if repetari >= 2:
-                self._spune("FORTEAZA", "modelul se repeta - cer raspunsul final fara unelte")
-                final = self.llm.invoke(
-                    mesaje
-                    + [
-                        SystemMessage(
-                            content=(
-                                "Ai toate informatiile necesare mai sus. Formuleaza ACUM "
-                                "raspunsul final pentru client, in limbaj natural. Nu mai "
-                                "cere nicio unealta."
-                            )
-                        )
-                    ]
+                return self._raspuns_final_fortat(
+                    mesaje, mesaj_user, "modelul se repeta - cer raspunsul final fara unelte"
                 )
-                self._numara_tokeni(final)
-                text = text_din(final)
-                self.istoric.append(mesaj_user)
-                self.istoric.append(AIMessage(content=text))
-                return text
+
+            # Daca modelul insista cu o unealta oprita de circuit breaker,
+            # nu mai are de unde sa afle ceva nou: cerem raspunsul final.
+            if apeluri_blocate >= 2:
+                return self._raspuns_final_fortat(
+                    mesaje, mesaj_user, "unealta oprita de circuit breaker - cer raspunsul final"
+                )
+
+            # Buget de tokeni pe toata tura (S6.7, "max_tokens total").
+            # MAX_TOKENS limiteaza un singur raspuns; aici oprim sirul de
+            # runde inainte sa scape costul de sub control.
+            consumati = self._tokeni["tokeni_intrare"] + self._tokeni["tokeni_iesire"]
+            if consumati >= config.MAX_TOKENS_TURA:
+                return self._raspuns_final_fortat(
+                    mesaje,
+                    mesaj_user,
+                    f"buget depasit ({consumati} din {config.MAX_TOKENS_TURA} tokeni)",
+                )
 
         # --- Plasa de siguranta: s-au terminat rundele (S6.7) --------------
         self._spune("STOP", f"limita de {self.max_iteratii} runde atinsa")
@@ -440,6 +508,33 @@ class QAAgent:
             f"verificari ({apeluri_totale} consultari). Te rog reformuleaza intrebarea sau "
             f"imparte-o in intrebari mai mici."
         )
+        self.istoric.append(mesaj_user)
+        self.istoric.append(AIMessage(content=text))
+        return text
+
+    def _raspuns_final_fortat(
+        self, mesaje: list[BaseMessage], mesaj_user: HumanMessage, motiv: str
+    ) -> str:
+        """
+        Iesire controlata din bucla (S6.7): mai apelam modelul o singura data,
+        FARA unelte. Neavand ce sa ceara, e obligat sa formuleze raspunsul din
+        ce a strans pana acum. Clientul primeste un raspuns, nu o eroare.
+        """
+        self._spune("FORTEAZA", motiv)
+        final = self.llm.invoke(
+            mesaje
+            + [
+                SystemMessage(
+                    content=(
+                        "Ai toate informatiile necesare mai sus. Formuleaza ACUM "
+                        "raspunsul final pentru client, in limbaj natural. Nu mai "
+                        "cere nicio unealta."
+                    )
+                )
+            ]
+        )
+        self._numara_tokeni(final)
+        text = text_din(final)
         self.istoric.append(mesaj_user)
         self.istoric.append(AIMessage(content=text))
         return text
