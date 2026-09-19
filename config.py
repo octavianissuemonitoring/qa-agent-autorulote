@@ -76,6 +76,10 @@ MAX_TOKENS_TURA = _numar("MAX_TOKENS_TURA", 50_000)
 TOOL_TIMEOUT = _zecimal("TOOL_TIMEOUT", 10.0)
 # 4. circuit breaker: dupa atatea erori intr-o tura, tool-ul nu mai e apelat
 TOOL_MAX_ERORI = _numar("TOOL_MAX_ERORI", 3)
+# Cand modelul se blocheaza: de cate ori il lasam sa ceara acelasi lucru
+# (sau un tool deja oprit) inainte sa-i cerem raspunsul final fara unelte.
+MAX_REPETARI = _numar("MAX_REPETARI", 2)
+MAX_APELURI_BLOCATE = _numar("MAX_APELURI_BLOCATE", 2)
 
 # --- Identitatea agentului (ajunge in system prompt prin Jinja2) ------
 NUME_COMPANIE = _text("NUME_COMPANIE", "CamperHub")

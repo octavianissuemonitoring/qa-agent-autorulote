@@ -97,6 +97,12 @@ Patru limite, toate reglabile din `.env`:
 | `MAX_TOKENS_TURA` | 50000 | tokenii consumați de toată tura (costuri) |
 | `TOOL_TIMEOUT` | 10 s | cât are voie să dureze o unealtă |
 | `TOOL_MAX_ERORI` | 3 | după atâtea erori, unealta nu mai e apelată (circuit breaker) |
+| `MAX_REPETARI` | 2 | de câte ori lasă modelul să ceară același lucru |
+| `MAX_APELURI_BLOCATE` | 2 | de câte ori insistă cu o unealtă deja oprită |
+
+Toate setările se citesc într-un singur loc, `config.py`, care e singurul fișier
+care deschide `.env`. Restul codului folosește `config.X`, deci nu există praguri
+scrise direct în cod.
 
 La oricare dintre ele, agentul nu crapă: mai cere modelului un răspuns final,
 fără unelte, din informațiile strânse până atunci (`_raspuns_final_fortat()`).

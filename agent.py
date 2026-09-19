@@ -478,14 +478,14 @@ class QAAgent:
 
             # --- Iesire fortata din bucla ---------------------------------
             # Daca modelul a repetat de doua ori, nu se mai desprinde singur.
-            if repetari >= 2:
+            if repetari >= config.MAX_REPETARI:
                 return self._raspuns_final_fortat(
                     mesaje, mesaj_user, "modelul se repeta - cer raspunsul final fara unelte"
                 )
 
             # Daca modelul insista cu o unealta oprita de circuit breaker,
             # nu mai are de unde sa afle ceva nou: cerem raspunsul final.
-            if apeluri_blocate >= 2:
+            if apeluri_blocate >= config.MAX_APELURI_BLOCATE:
                 return self._raspuns_final_fortat(
                     mesaje, mesaj_user, "unealta oprita de circuit breaker - cer raspunsul final"
                 )
