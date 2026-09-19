@@ -87,7 +87,7 @@ class ToolWrapper:
             return rezultat
 
     # -----------------------------------------------------------------
-    # _executa(): Lookup -> Validate -> Execute -> Return
+    # _executa(): Lookup -> Validate -> Execute -> Validate output -> Return
     # -----------------------------------------------------------------
     @staticmethod
     def _executa(nume: str, parametri: dict[str, Any]) -> str:
@@ -139,7 +139,20 @@ class ToolWrapper:
             # omoare agentul. Ii spunem LLM-ului ce s-a intamplat.
             return f"EROARE la executia tool-ului '{nume}': {type(e).__name__}: {e}"
 
-        # --- 4. RETURN: mereu text ----------------------------------
+        # --- 4. VALIDATE OUTPUT: rezultatul are sens? ---------------
+        # S6.6, "Rezultat invalid": un tool care intoarce None sau text gol
+        # nu a crapat, dar nici nu i-a dat LLM-ului nimic. Fara verificarea
+        # asta, modelul ar primi textul 'None' sau '' si ar putea inventa
+        # raspunsul. Ii spunem clar ca informatia lipseste.
+        if rezultat is None or not str(rezultat).strip():
+            return (
+                f"EROARE: tool-ul '{nume}' a returnat un rezultat gol. "
+                f"Nu ai primit nicio informatie - nu presupune un raspuns. "
+                f"Incearca alti parametri sau spune-i clientului ca informatia "
+                f"nu este disponibila momentan."
+            )
+
+        # --- 5. RETURN: mereu text ----------------------------------
         # LLM-ul primeste text, nu obiecte Python.
         return rezultat if isinstance(rezultat, str) else str(rezultat)
 
