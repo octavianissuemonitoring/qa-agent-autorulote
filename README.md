@@ -11,7 +11,7 @@ disponibilitate, prețuri și scadențe tehnice — folosind **tools reale**, nu
 | 1 | Tools cu Pydantic + `@register_tool` + `ToolWrapper` | `tools/` |
 | 2 | Prompts în YAML + Jinja2 cu `PromptRegistry` | `prompts/` |
 | 3 | Agent QA care leagă LLM + tools + prompts | `agent.py` |
-| 4 | ReAct loop (Think→Act→Observe) | `agent.py` → `react_loop()` |
+| 4 | ReAct loop (Think→Act→Observe) | `agent.py` → `react_loop()` + `execute_tool()` (S6.4), `execute_all_tools()` în paralel (S6.5) |
 
 ## Instalare (o singură dată)
 

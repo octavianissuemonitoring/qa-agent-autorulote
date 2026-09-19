@@ -13,8 +13,14 @@ Trei piese din curs se intalnesc aici:
   Factory  (S4.4) - modele.creeaza_llm() construieste orice model activ din .env
   Registry (S3.6) - system prompt-ul vine din YAML, nu din cod
   ReAct    (S6.2) - bucla de rationament cu unelte
+
+Functiile din slide-urile S6.4 si S6.5 sunt la nivel de modul, sub text_din():
+  execute_tool()        S6.4 - executa sigur UN tool cerut de model
+  execute_tool_async()  S6.5 - acelasi lucru, intr-un thread separat
+  execute_all_tools()   S6.5 - toate tool-urile unei runde, in paralel
 """
 
+import asyncio
 import uuid
 from datetime import datetime
 from typing import Any, Iterator
@@ -67,6 +73,45 @@ def text_din(raspuns: BaseMessage) -> str:
         return "\n".join(b for b in bucati if b).strip()
 
     return str(continut)
+
+
+# ---------------------------------------------------------------------
+# Executia tool-urilor (S6.4 + S6.5)
+# ---------------------------------------------------------------------
+def execute_tool(tool_call: dict) -> str:
+    """
+    S6.4 - helper: executie sigura a unui tool cerut de LLM.
+
+    Pasii de pe slide (cauta tool-ul in registry, executa in try/except,
+    intoarce eroarea ca text) se fac in ToolWrapper.call(). In plus fata de
+    slide, acolo parametrii se valideaza cu Pydantic (S6.6) si executia
+    apare in LangSmith (S8). Rezultatul e mereu un text, niciodata o exceptie:
+    loop-ul ReAct nu trebuie sa cada din cauza unui tool.
+    """
+    name = tool_call.get("name", "")
+    args = tool_call.get("args", {}) or {}
+    return ToolWrapper.call(name, args)
+
+
+async def execute_tool_async(tool_call: dict) -> dict:
+    """
+    S6.5 - ruleaza tool-ul (sincron) intr-un thread separat, ca sa nu
+    blocheze celelalte tool-uri din aceeasi runda.
+
+    asyncio.to_thread() copiaza contextul curent in thread, deci executia
+    ramane legata de trace-ul LangSmith al turei.
+    """
+    rezultat = await asyncio.to_thread(execute_tool, tool_call)
+    return {"tool_call_id": tool_call.get("id", tool_call.get("name", "")), "content": str(rezultat)}
+
+
+async def execute_all_tools(tool_calls: list) -> list:
+    """
+    S6.5 - lansam toate tool-urile simultan, nu asteptam pe rand.
+    gather() intoarce rezultatele IN ORDINEA cererilor, oricare ar termina primul.
+    """
+    tasks = [execute_tool_async(tc) for tc in tool_calls]
+    return await asyncio.gather(*tasks)
 
 
 class QAAgent:
@@ -306,10 +351,16 @@ class QAAgent:
                 self.istoric.append(AIMessage(content=text))
                 return text
 
-            # --- Executam TOATE uneltele cerute in aceasta runda (S6.5) ----
+            # --- ACT: executam TOATE uneltele cerute in aceasta runda --------
             self._spune("ACTIONEAZA", f"{len(apeluri)} unelte cerute in aceasta runda")
 
-            for apel in apeluri:
+            # Intai triem cererile: cele repetate nu se mai executa (S6.7),
+            # primesc direct un mesaj care il trimite pe model la rezultatul
+            # pe care il are deja.
+            rezultate: dict[int, str] = {}
+            de_executat: list[tuple[int, dict]] = []
+
+            for i, apel in enumerate(apeluri):
                 nume = apel.get("name", "")
                 argumente = apel.get("args", {}) or {}
                 apeluri_totale += 1
@@ -323,7 +374,7 @@ class QAAgent:
                 if semnatura in semnaturi_vazute:
                     repetari += 1
                     self._spune("  !!", f"{nume} cerut din nou cu aceiasi parametri")
-                    rezultat = (
+                    rezultate[i] = (
                         f"Ai apelat deja '{nume}' cu exact acesti parametri in aceasta "
                         f"conversatie, iar rezultatul este mai sus. Nu il cere din nou: "
                         f"foloseste informatia pe care o ai si formuleaza raspunsul final "
@@ -332,8 +383,20 @@ class QAAgent:
                 else:
                     semnaturi_vazute.add(semnatura)
                     self._spune("  ->", f"{nume}({relevanti})")
-                    rezultat = ToolWrapper.call(nume, argumente)
+                    de_executat.append((i, apel))
 
+            # Cele noi ruleaza in paralel (S6.5). gather() pastreaza ordinea.
+            if de_executat:
+                if len(de_executat) > 1:
+                    self._spune("  ||", f"{len(de_executat)} unelte executate in paralel")
+                executate = asyncio.run(execute_all_tools([apel for _, apel in de_executat]))
+                for (i, _), rezultat in zip(de_executat, executate):
+                    rezultate[i] = rezultat["content"]
+
+            # --- OBSERVE: trimitem rezultatele inapoi la LLM ----------------
+            for i, apel in enumerate(apeluri):
+                nume = apel.get("name", "")
+                rezultat = rezultate[i]
                 self._spune(
                     "OBSERVA",
                     f"{nume} -> {rezultat[:120]}{'...' if len(rezultat) > 120 else ''}",
