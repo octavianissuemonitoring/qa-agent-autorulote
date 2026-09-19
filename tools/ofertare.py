@@ -144,7 +144,7 @@ def calculate_quote(params: OfertaParams) -> str:
     if sezon_preluare is None:
         return (
             f"EROARE de configurare: ziua {start} nu apartine niciunui sezon definit. "
-            f"Ruleaza valideaza_date.py."
+            f"Verifica sezoanele partenerului in data/parteneri.json."
         )
     minim = sezon_preluare.get("durata_minima_zile", 1)
     if unitati < minim:

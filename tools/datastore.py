@@ -72,13 +72,13 @@ def partener(partener_id: str) -> dict | None:
 def partenerul_vehiculului(v: dict) -> dict:
     """
     Partenerul care detine vehiculul. Arunca daca lipseste, pentru ca e o
-    ruptura de integritate pe care valideaza_date.py ar fi trebuit s-o prinda.
+    ruptura de integritate in data/flota.json sau data/parteneri.json.
     """
     p = partener(v["partener_id"])
     if p is None:
         raise KeyError(
             f"Vehiculul {v['id']} indica partenerul {v['partener_id']!r}, care nu exista. "
-            f"Ruleaza valideaza_date.py."
+            f"Verifica data/flota.json si data/parteneri.json."
         )
     return p
 
@@ -175,7 +175,7 @@ def extraoptiunile_vehiculului(v: dict) -> list[dict]:
     for extra_id, oferta in preturi_partener.items():
         glob = extraoptiune_globala(extra_id)
         if glob is None:
-            continue  # integritate rupta; valideaza_date.py o semnaleaza
+            continue  # integritate rupta: extraoptiune inexistenta in extraoptiuni.json
 
         # Lipsa din catalogul vehiculului = nu se poate monta.
         intrare = catalog_vehicul.get(extra_id, {"regim": "indisponibil"})

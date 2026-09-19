@@ -257,7 +257,7 @@ class QAAgent:
             self._statistici.update(self._tokeni)
             run.end(outputs={"raspuns": raspuns, **self._statistici})
             # Retinem adresa trace-ului, ca sa-l putem regasi exact in LangSmith
-            # (verifica_langsmith.py si comanda /trace din CLI).
+            # (comanda /trace din CLI).
             self.ultimul_run_id = str(run.id)
             return raspuns
 
