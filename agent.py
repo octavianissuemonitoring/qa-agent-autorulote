@@ -26,7 +26,7 @@ import threading
 import uuid
 from concurrent.futures import Executor, Future
 from datetime import datetime
-from typing import Any, Iterator
+from typing import Any, Callable, Iterator
 from zoneinfo import ZoneInfo
 
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -46,7 +46,7 @@ from prompts import get_prompt_registry
 from tools import ToolWrapper
 
 
-def text_din(raspuns: BaseMessage) -> str:
+def text_din(raspuns: BaseMessage, curata: bool = True) -> str:
     """
     Extrage textul dintr-un raspuns al modelului.
 
@@ -60,6 +60,10 @@ def text_din(raspuns: BaseMessage) -> str:
         Blocurile pot fi text, imagini, sau urme de rationament. Noua ne
         trebuie doar textul. Functia trateaza ambele forme, ca acelasi cod
         sa mearga si pe Ollama (sir), si pe Gemini (lista).
+
+    curata=False pentru BUCATILE dintr-un stream: acolo spatiile de la capete
+    sunt reale. Taindu-le, "75,00 EUR" lipit de bucata urmatoare devine
+    "75,00EUR" - exact genul de greseala pe care o vezi abia pe ecran.
     """
     continut = raspuns.content
 
@@ -73,7 +77,8 @@ def text_din(raspuns: BaseMessage) -> str:
                 bucati.append(bloc)
             elif isinstance(bloc, dict) and bloc.get("type") == "text":
                 bucati.append(bloc.get("text", ""))
-        return "\n".join(b for b in bucati if b).strip()
+        text = "\n".join(b for b in bucati if b)
+        return text.strip() if curata else text
 
     return str(continut)
 
@@ -314,7 +319,7 @@ class QAAgent:
     # -----------------------------------------------------------------
     # LECTIA 2: bucla ReAct cu unelte (S6.2 - S6.7)
     # -----------------------------------------------------------------
-    def react_loop(self, mesaj: str) -> str:
+    def react_loop(self, mesaj: str, pe_text: Callable[[str], None] | None = None) -> str:
         """
         O tura completa de conversatie, inregistrata ca UN SINGUR trace (S8).
 
@@ -326,6 +331,10 @@ class QAAgent:
         Metadata (S8.8) raspunde la intrebarile pe care ti le vei pune cand
         ceva merge prost: ce model a raspuns? ce versiune de prompt era activa?
         din ce conversatie face parte mesajul?
+
+        pe_text: daca il dai, raspunsul FINAL curge bucata cu bucata prin el
+        (streaming, Lectia 1). Rundele cu unelte nu pot curge: ca sa stii ce
+        unealta cere modelul, iti trebuie cererea intreaga.
         """
         registry = get_prompt_registry()
         self._statistici = {"runde": 0, "apeluri_unelte": 0}
@@ -347,7 +356,7 @@ class QAAgent:
                 "max_iteratii": self.max_iteratii,
             },
         ) as run:
-            raspuns = self._react_loop_intern(mesaj)
+            raspuns = self._react_loop_intern(mesaj, pe_text)
             self._statistici.update(self._tokeni)
             run.end(outputs={"raspuns": raspuns, **self._statistici})
             # Retinem adresa trace-ului, ca sa-l putem regasi exact in LangSmith
@@ -355,7 +364,7 @@ class QAAgent:
             self.ultimul_run_id = str(run.id)
             return raspuns
 
-    def _react_loop_intern(self, mesaj: str) -> str:
+    def _react_loop_intern(self, mesaj: str, pe_text: Callable[[str], None] | None = None) -> str:
         """
         GANDESTE -> ACTIONEAZA -> OBSERVA, pana la raspunsul final.
 
@@ -388,7 +397,7 @@ class QAAgent:
         for iteratie in range(1, self.max_iteratii + 1):
             self._spune("GANDESTE", f"runda {iteratie}/{self.max_iteratii}")
 
-            raspuns: AIMessage = self.llm_cu_unelte.invoke(mesaje)
+            raspuns: AIMessage = self._cere_modelului(mesaje, pe_text)
             self._numara_tokeni(raspuns)
             mesaje.append(raspuns)
 
@@ -480,14 +489,14 @@ class QAAgent:
             # Daca modelul a repetat de doua ori, nu se mai desprinde singur.
             if repetari >= config.MAX_REPETARI:
                 return self._raspuns_final_fortat(
-                    mesaje, mesaj_user, "modelul se repeta - cer raspunsul final fara unelte"
+                    mesaje, mesaj_user, "modelul se repeta - cer raspunsul final fara unelte", pe_text
                 )
 
             # Daca modelul insista cu o unealta oprita de circuit breaker,
             # nu mai are de unde sa afle ceva nou: cerem raspunsul final.
             if apeluri_blocate >= config.MAX_APELURI_BLOCATE:
                 return self._raspuns_final_fortat(
-                    mesaje, mesaj_user, "unealta oprita de circuit breaker - cer raspunsul final"
+                    mesaje, mesaj_user, "unealta oprita de circuit breaker - cer raspunsul final", pe_text
                 )
 
             # Buget de tokeni pe toata tura (S6.7, "max_tokens total").
@@ -499,6 +508,7 @@ class QAAgent:
                     mesaje,
                     mesaj_user,
                     f"buget depasit ({consumati} din {config.MAX_TOKENS_TURA} tokeni)",
+                    pe_text,
                 )
 
         # --- Plasa de siguranta: s-au terminat rundele (S6.7) --------------
@@ -508,10 +518,42 @@ class QAAgent:
             mesaje,
             mesaj_user,
             f"cele {self.max_iteratii} runde s-au epuizat dupa {apeluri_totale} consultari",
+            pe_text,
         )
 
+    def _cere_modelului(
+        self, mesaje: list[BaseMessage], pe_text: Callable[[str], None] | None
+    ) -> AIMessage:
+        """
+        Un apel la model, cu unelte. Cu pe_text, textul curge bucata cu bucata.
+
+        DE CE MERGE, desi bucla are nevoie de cererea INTREAGA ca sa stie ce
+        unealta sa execute: bucatile se aduna intr-un singur mesaj (LangChain
+        le stie aduna cu +), iar bucla primeste la final exact acelasi obiect
+        ca la invoke(). Doar TEXTUL apare pe ecran pe masura ce vine.
+
+        In rundele in care modelul cere unelte, textul e gol - modelul cere,
+        nu vorbeste - deci pe ecran nu apare nimic pana la raspunsul final.
+        """
+        if pe_text is None:
+            return self.llm_cu_unelte.invoke(mesaje)
+
+        adunat: Any = None
+        for bucata in self.llm_cu_unelte.stream(mesaje):
+            adunat = bucata if adunat is None else adunat + bucata
+            text = text_din(bucata, curata=False)
+            if text:
+                pe_text(text)
+
+        # Un stream gol (modelul nu a scris nimic) nu trebuie sa darame tura.
+        return adunat if adunat is not None else AIMessage(content="")
+
     def _raspuns_final_fortat(
-        self, mesaje: list[BaseMessage], mesaj_user: HumanMessage, motiv: str
+        self,
+        mesaje: list[BaseMessage],
+        mesaj_user: HumanMessage,
+        motiv: str,
+        pe_text: Callable[[str], None] | None = None,
     ) -> str:
         """
         Iesire controlata din bucla (S6.7): mai apelam modelul o singura data,
@@ -525,7 +567,18 @@ class QAAgent:
         """
         self._spune("FORTEAZA", motiv)
         instructiune = get_prompt_registry().render("qa_agent_limita", motiv=motiv)
-        final = self.llm.invoke(mesaje + [SystemMessage(content=instructiune)])
+        mesaje_final = mesaje + [SystemMessage(content=instructiune)]
+
+        if pe_text is None:
+            final = self.llm.invoke(mesaje_final)
+        else:
+            adunat: Any = None
+            for bucata in self.llm.stream(mesaje_final):
+                adunat = bucata if adunat is None else adunat + bucata
+                text = text_din(bucata)
+                if text:
+                    pe_text(text)
+            final = adunat if adunat is not None else AIMessage(content="")
         self._numara_tokeni(final)
         text = text_din(final)
 
@@ -536,11 +589,18 @@ class QAAgent:
         if not text.strip():
             self._spune("GOL", "raspunsul final a iesit gol - folosesc textul de rezerva")
             text = get_prompt_registry().render("qa_agent_limita_text")
+            if pe_text is not None:
+                pe_text(text)
         else:
             # Mentiunea o adaugam NOI, nu modelul: altfel apare doar cand
             # modelul are chef sa asculte instructiunea. Clientul afla mereu
             # ca raspunsul nu a mai fost verificat mai departe.
-            text = text.rstrip() + "\n\n" + get_prompt_registry().render("qa_agent_limita_nota")
+            nota = get_prompt_registry().render("qa_agent_limita_nota")
+            text = text.rstrip() + "\n\n" + nota
+            # Mentiunea a fost adaugata de noi, deci tot noi o trimitem pe ecran:
+            # modelul nu a scris-o, deci nu a trecut prin stream.
+            if pe_text is not None:
+                pe_text("\n\n" + nota)
 
         self.istoric.append(mesaj_user)
         self.istoric.append(AIMessage(content=text))

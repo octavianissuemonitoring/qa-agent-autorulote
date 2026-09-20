@@ -13,7 +13,7 @@ o primeste clientul cand tura se opreste la o limita.
 import time
 
 import pytest
-from langchain_core.messages import AIMessage
+from langchain_core.messages import AIMessage, AIMessageChunk
 
 import config
 from agent import QAAgent, execute_all_tools, execute_tool
@@ -35,6 +35,10 @@ class LLMFals:
         if self.cereri:
             return AIMessage(content="", tool_calls=self.cereri.pop(0), usage_metadata=UZ)
         return AIMessage(content=self.final, usage_metadata=UZ)
+
+    def stream(self, mesaje):
+        """Modelul minimal: o singura bucata, cat tot raspunsul."""
+        yield self.invoke(mesaje)
 
 
 class LLMInsistent(LLMFals):
@@ -273,3 +277,75 @@ def execute_all_tools_sync(cereri: list[dict]) -> list[dict]:
     import asyncio
 
     return asyncio.run(execute_all_tools(cereri))
+
+
+# ---------------------------------------------------------------------
+# Streaming: doar raspunsul FINAL curge; rundele cu unelte nu pot
+# ---------------------------------------------------------------------
+class LLMCareCurge(LLMFals):
+    """Imparte raspunsul final in bucati, ca un model real."""
+
+    def __init__(self, bucati: list[str], cereri=None):
+        super().__init__(cereri)
+        self.bucati = bucati
+
+    def stream(self, mesaje):
+        raspuns = self.invoke(mesaje)
+        if raspuns.tool_calls:
+            # Runda cu unelte: modelul cere, nu vorbeste. O singura bucata,
+            # fara text - exact ce face si modelul real.
+            yield raspuns
+            return
+        # Modelele reale trimit AIMessageChunk: bucati care stiu sa se adune
+        # cu +. Un AIMessage obisnuit nu stie, si de-aia testul le foloseste.
+        for b in self.bucati:
+            yield AIMessageChunk(content=b, usage_metadata=UZ)
+
+
+def test_raspunsul_final_curge_bucata_cu_bucata():
+    primite = []
+    ag = agent_cu(LLMCareCurge(["Buna ", "ziua!"]))
+    raspuns = ag.react_loop("salut", pe_text=primite.append)
+    assert primite == ["Buna ", "ziua!"]
+    assert raspuns == "Buna ziua!"
+
+
+def test_spatiile_dintre_bucati_se_pastreaza():
+    """Regresie: text_din() taia spatiile si iesea '75,00EUR'."""
+    primite = []
+    ag = agent_cu(LLMCareCurge(["Total: 75,00 ", "EUR"]))
+    ag.react_loop("cat costa?", pe_text=primite.append)
+    assert "".join(primite) == "Total: 75,00 EUR"
+
+
+def test_runda_cu_unelte_nu_scrie_nimic_pe_ecran():
+    primite = []
+    llm = LLMCareCurge(["Gata."], cereri=[[{"name": "t", "args": {}, "id": "c1"}]])
+    ag = agent_cu(llm)
+    ag.react_loop("test", pe_text=primite.append)
+    assert primite == ["Gata."], "a curs text dintr-o runda cu unelte"
+
+
+def test_fara_callback_comportamentul_ramane_neschimbat():
+    ag = agent_cu(LLMCareCurge(["nefolosit"]))
+    assert ag.react_loop("salut") == "Raspuns final."
+
+
+def test_mentiunea_de_limita_ajunge_si_ea_pe_ecran(monkeypatch):
+    """Mentiunea e adaugata de agent, nu de model, deci o trimitem noi."""
+    monkeypatch.setattr(config, "MAX_TOKENS_TURA", 300)
+    primite = []
+    ag = agent_cu(LLMInsistent(), llm_final=LLMCareCurge(["Raspuns ", "partial."]))
+    raspuns = ag.react_loop("test", pe_text=primite.append)
+    pe_ecran = "".join(primite)
+    assert "Raspuns partial." in pe_ecran
+    assert "Mențiune" in pe_ecran
+    assert pe_ecran.strip() == raspuns.strip()
+
+
+def test_textul_de_rezerva_ajunge_pe_ecran(monkeypatch):
+    monkeypatch.setattr(config, "MAX_TOKENS_TURA", 300)
+    primite = []
+    ag = agent_cu(LLMInsistent(), llm_final=LLMCareCurge([""]))
+    ag.react_loop("test", pe_text=primite.append)
+    assert "nu am reușit" in " ".join("".join(primite).split())

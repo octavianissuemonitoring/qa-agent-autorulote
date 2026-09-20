@@ -183,14 +183,33 @@ def main() -> int:
             continue
 
         print()
+
+        # Streaming (Lectia 1): raspunsul FINAL se scrie pe ecran pe masura ce
+        # vine de la model. Rundele cu unelte nu pot curge - ca sa stii ce
+        # unealta cere modelul, iti trebuie cererea intreaga - deci pana la
+        # ultimul pas se vede doar rationamentul, cu --verbose.
+        inceput = False
+
+        def scrie(bucata: str) -> None:
+            nonlocal inceput
+            if not inceput:
+                print(f"\n{config.NUME_AGENT} > ", end="", flush=True)
+                inceput = True
+            print(bucata, end="", flush=True)
+
         try:
-            raspuns = agent.react_loop(linie)
+            raspuns = agent.react_loop(linie, pe_text=scrie)
         except Exception as e:
             # Agentul nu are voie sa moara dintr-o eroare de retea sau de model.
             print(f"\n{config.NUME_AGENT} > A aparut o problema tehnica: {type(e).__name__}: {e}")
             continue
 
-        print(f"\n{config.NUME_AGENT} > {raspuns}")
+        if inceput:
+            print()  # inchidem linia pe care a scris streamul
+        else:
+            # Modelul nu a trimis nimic prin stream (raspuns gol sau text de
+            # rezerva construit de noi): il afisam ca pana acum.
+            print(f"\n{config.NUME_AGENT} > {raspuns}")
 
     print("\nLa revedere.")
     return 0

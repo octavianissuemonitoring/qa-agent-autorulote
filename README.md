@@ -132,6 +132,16 @@ Două reguli de construcție:
   apar ca avertisment în disponibilitate și în deviz. Nu blochează închirierea:
   pot fi reînnoite până la preluare, iar agentul îi spune clientului.
 
+## Streaming
+
+Răspunsul final apare pe ecran pe măsură ce vine de la model, nu dintr-o dată la
+final. Rundele în care agentul cere unelte **nu pot** curge: ca să știi ce unealtă
+cere modelul, îți trebuie cererea întreagă. Deci ordinea e: runde de verificare
+(vizibile cu `--verbose`), apoi răspunsul care se scrie sub ochii tăi.
+
+`agent.react_loop(mesaj, pe_text=...)` primește o funcție apelată pentru fiecare
+bucată de text. Fără ea, comportamentul e cel dinainte: un singur răspuns la final.
+
 ## Plasele de siguranță (S6.7)
 
 Patru limite, toate reglabile din `.env`:
