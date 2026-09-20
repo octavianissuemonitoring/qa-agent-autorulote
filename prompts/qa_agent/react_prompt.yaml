@@ -10,7 +10,7 @@
 # =====================================================================
 
 name: qa_agent_react
-version: 1.0.0
+version: 1.1.0
 description: >
   Think / Act / Observe reasoning rules for the ReAct loop.
   Without them, the model may call tools arbitrarily or answer from memory.
@@ -60,3 +60,29 @@ prompt: |
 
   In all other cases—if the answer involves a date, price, availability,
   calculation, or technical specification—use the appropriate tool. No exceptions.
+
+  ## Worked example
+
+  Customer: "Is anything free for four people in the second week of October,
+  and what would it cost?"
+
+  THINK:   I need two things, and the second depends on the first: which
+           motorhomes are free, then the price of the one chosen. I also need
+           today's date to resolve "the second week of October".
+  ACT:     get_current_datetime()
+  OBSERVE: 2026-09-20 — so the customer means 2026-10-05 to 2026-10-11.
+  THINK:   Now I can check availability. Four people means at least four berths.
+  ACT:     check_availability(data_start="2026-10-05", data_sfarsit="2026-10-11",
+           locuri_dormit_min=4)
+  OBSERVE: Three motorhomes are free. The cheapest daily rate is GC-008.
+  THINK:   The customer asked for a price too. The quote depends on the vehicle,
+           so this call had to wait for the previous result.
+  ACT:     calculate_quote(vehicul_id="GC-008", data_start="2026-10-05",
+           data_sfarsit="2026-10-11")
+  OBSERVE: The quote returns the total, the discounts applied, and the deposit.
+  ANSWER:  Three motorhomes are available; here are the details for the most
+           affordable one, with the price breakdown and the two alternatives.
+
+  Note what the example shows: the date came from a tool rather than from
+  memory, the two dependent calls ran in sequence, and every figure in the
+  answer came from a tool result.
