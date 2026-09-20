@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field
 
 from tools import calendar_flota as cal
 from tools import datastore
+from tools.perioada import PerioadaInchiriere
 from tools.registry import register_tool
 
 
@@ -52,17 +53,29 @@ class MatchingParams(BaseModel):
     )
 
 
-def _economie(v: dict, partener: dict, reduceri: dict, start: date, durata: int) -> tuple[float, list[str]]:
-    """Cat se economiseste pornind inchirierea la data data, pe durata data."""
+def _economie(
+    v: dict, partener: dict, reduceri: dict, perioada: PerioadaInchiriere
+) -> tuple[float, list[str]]:
+    """
+    Cat se economiseste pe perioada propusa.
+
+    Se socotesc doar zilele FACTURATE: pe nopti, ziua predarii nu intra in pret,
+    deci nici reducerea de pe ea nu e o economie reala.
+
+    Un tarif lipsa nu devine 0 (ar insemna o zi gratuita), ci opreste calculul -
+    datastore.tarif_sezon ridica o eroare de configurare, pe care tool-ul o preda
+    modelului ca text.
+    """
     total = 0.0
     detalii: list[str] = []
-    for i in range(durata):
-        zi = start + timedelta(days=i)
+    for zi in perioada.zile_facturate:
         info = reduceri.get(zi)
         if not info:
             continue
         sezon = cal.sezon_pentru_zi(partener, zi)
-        tarif = float(v["tarife_sezon"].get(sezon["cod"], 0)) if sezon else 0.0
+        if sezon is None:
+            continue
+        tarif = datastore.tarif_sezon(v, sezon["cod"])
         valoare = round(tarif * info["procent"] / 100, 2)
         total += valoare
         detalii.append(f"{zi.isoformat()} -{info['procent']}% ({valoare:.2f})")
@@ -135,19 +148,28 @@ def find_matching_opportunities(params: MatchingParams) -> str:
 
                 if durata < minim:
                     continue  # sub durata minima a sezonului in care s-ar prelua
-                if offset + durata > lungime_fereastra:
-                    continue  # nu incape in fereastra
 
-                economie, detalii = _economie(v, partener, reduceri, start, durata)
+                # Perioada se construieste dupa sistemul partenerului: pe nopti,
+                # 5 unitati inseamna predare peste 5 zile, nu peste 4. Fara asta,
+                # recomandarea iese cu o zi mai scurta si calculate_quote o refuza.
+                perioada = PerioadaInchiriere.din_unitati(partener, start, durata)
+
+                # Incadrarea in fereastra se verifica pe zilele OCUPATE, care
+                # includ ziua predarii - atunci masina inca nu e libera.
+                if perioada.predare > fereastra_sfarsit:
+                    continue
+
+                try:
+                    economie, detalii = _economie(v, partener, reduceri, perioada)
+                except KeyError as e:
+                    return f"EROARE DE CONFIGURARE: {e.args[0]}"
                 if economie <= 0:
                     continue
                 if cea_mai_buna is None or economie > cea_mai_buna["economie"]:
                     cea_mai_buna = {
-                        "start": start,
-                        "sfarsit": start + timedelta(days=durata - 1),
+                        "perioada": perioada,
                         "economie": economie,
                         "detalii": detalii,
-                        "durata": durata,
                         "sezon": sezon["nume"],
                     }
 
@@ -165,7 +187,7 @@ def find_matching_opportunities(params: MatchingParams) -> str:
         return (
             f"Nu am gasit perioade cu reducere pentru zile lipite intre "
             f"{de_la.isoformat()} si {pana_la.isoformat()}"
-            + (f" pentru o durata de {params.durata_zile} zile" if params.durata_zile else "")
+            + (f" pentru o durata de {params.durata_zile} unitati" if params.durata_zile else "")
             + ". Reducerile apar doar in jurul inchirierilor deja confirmate."
         )
 
@@ -183,9 +205,9 @@ def find_matching_opportunities(params: MatchingParams) -> str:
         r.append(
             f"  {v['id']} - {v['nume_comercial']} ({v['locuri_dormit']} locuri de dormit)"
         )
+        perioada: PerioadaInchiriere = o["perioada"]
         r.append(
-            f"      Perioada recomandata: {o['start'].isoformat()} - {o['sfarsit'].isoformat()} "
-            f"({o['durata']} zile, {o['sezon'].lower()})"
+            f"      Perioada recomandata: {perioada.descriere}, {o['sezon'].lower()}"
         )
         r.append(f"      Zile cu reducere: {', '.join(o['detalii'])}")
         r.append(f"      ECONOMIE: {o['economie']:.2f} {o['moneda']}")

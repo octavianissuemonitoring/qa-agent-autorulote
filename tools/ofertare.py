@@ -31,6 +31,7 @@ from pydantic import BaseModel, Field
 
 from tools import calendar_flota as cal
 from tools import datastore
+from tools.perioada import PerioadaInchiriere
 from tools.registry import register_tool
 
 
@@ -120,22 +121,22 @@ def calculate_quote(params: OfertaParams) -> str:
     partener = datastore.partenerul_vehiculului(v)
     reguli = partener["reguli_operationale"]
     moneda = reguli["moneda"]
-    pe_nopti = reguli["sistem_calcul"] == "nopti"
-    eticheta = "nopti" if pe_nopti else "zile"
-    unitate_singular = "noapte" if pe_nopti else "zi"
-
     avertismente: list[str] = []
 
     # -----------------------------------------------------------------
-    # 1. Unitati facturabile
+    # 1. Perioada, in reprezentarea partenerului (zile sau nopti)
     # -----------------------------------------------------------------
-    unitati = cal.numar_unitati(partener, start, sfarsit)
+    perioada = PerioadaInchiriere.din_date(partener, start, sfarsit)
+    pe_nopti = perioada.pe_nopti
+    eticheta = perioada.eticheta
+    unitate_singular = perioada.unitate_singular
+    unitati = perioada.unitati
     if unitati <= 0:
         return (
             f"EROARE: perioada {start} - {sfarsit} nu produce nicio unitate facturabila. "
             f"In sistemul pe nopti, preluarea si predarea nu pot fi in aceeasi zi."
         )
-    zile = cal.zilele_facturate(partener, start, sfarsit)
+    zile = perioada.zile_facturate
 
     # -----------------------------------------------------------------
     # 2. Durata minima (dupa sezonul zilei de preluare)
@@ -163,6 +164,11 @@ def calculate_quote(params: OfertaParams) -> str:
             f"AUTORULOTA NU E DISPONIBILA in aceasta perioada: {motive[0]}. "
             f"Devizul de mai jos e doar informativ."
         )
+    # Documentele nu blocheaza oferta, dar clientul trebuie sa stie (pot fi
+    # reinnoite pana la preluare - de aceea e avertisment, nu refuz).
+    for problema in datastore.documente_expirate(v["id"], perioada.predare):
+        avertismente.append(f"DOCUMENTE: {problema}.")
+
     for p in cal.suprapuneri_provizorii(v["id"], start, sfarsit):
         avertismente.append(
             f"Exista deja interes pe aceste date "
@@ -199,8 +205,19 @@ def calculate_quote(params: OfertaParams) -> str:
 
     for zi in zile:
         sezon = cal.sezon_pentru_zi(partener, zi)
-        cod = sezon["cod"] if sezon else None
-        tarif = float(v["tarife_sezon"].get(cod, 0))
+        if sezon is None:
+            return (
+                f"EROARE DE CONFIGURARE: ziua {zi.isoformat()} nu apartine niciunui sezon "
+                f"definit pentru partenerul {partener['id']}. Verifica data/parteneri.json."
+            )
+        cod = sezon["cod"]
+
+        try:
+            tarif = datastore.tarif_sezon(v, cod)
+        except KeyError as e:
+            # Fail closed (S6.6): mai bine oprim oferta decat sa trimitem
+            # clientului un pret in care o zi costa 0.
+            return f"EROARE DE CONFIGURARE: {e.args[0]}"
 
         reducere = reduceri.get(zi)
         if reducere:

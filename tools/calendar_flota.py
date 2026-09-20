@@ -21,6 +21,7 @@ Regula de buffer:
 from datetime import date, timedelta
 
 from tools import datastore
+from tools.perioada import PerioadaInchiriere
 
 
 # ---------------------------------------------------------------------
@@ -56,13 +57,11 @@ def numar_unitati(partener: dict, start: date, sfarsit: date) -> int:
     """
     Cate unitati se factureaza, dupa sistemul partenerului.
 
-      sistem 'zile'  -> fiecare zi calendaristica atinsa:  10-12 aug = 3 zile
-      sistem 'nopti' -> ca la hotel:                       10-12 aug = 2 nopti
+    Socoteala traieste acum in PerioadaInchiriere - singurul loc care traduce
+    intre date calendaristice si unitati facturabile. Functia ramane ca scurtatura
+    pentru codul care vrea doar numarul.
     """
-    diferenta = (sfarsit - start).days
-    if partener["reguli_operationale"]["sistem_calcul"] == "nopti":
-        return max(diferenta, 0)
-    return max(diferenta + 1, 0)
+    return PerioadaInchiriere.din_date(partener, start, sfarsit).unitati
 
 
 def zilele_facturate(partener: dict, start: date, sfarsit: date) -> list[date]:
@@ -70,7 +69,7 @@ def zilele_facturate(partener: dict, start: date, sfarsit: date) -> list[date]:
     Zilele efectiv facturate, ca lista. In sistemul pe nopti, ultima zi
     (ziua predarii) nu se factureaza - de aceea lista e mai scurta cu una.
     """
-    return [start + timedelta(days=i) for i in range(numar_unitati(partener, start, sfarsit))]
+    return PerioadaInchiriere.din_date(partener, start, sfarsit).zile_facturate
 
 
 # ---------------------------------------------------------------------
@@ -102,7 +101,12 @@ def zile_blocate(vehicul_id: str, partener: dict) -> dict[date, str]:
 
         zi = start
         while zi <= sfarsit:
-            blocate[zi] = f"rezervare {r['id']} ({r['status']})"
+            eticheta = r["status"]
+            if datastore.status_necunoscut(r):
+                # Blocam prudent, dar spunem clar ca e o problema de date:
+                # altfel operatorul nu afla niciodata de greseala din JSON.
+                eticheta = f"{r['status']} - STATUS NECUNOSCUT, blocat prudent"
+            blocate[zi] = f"rezervare {r['id']} ({eticheta})"
             zi += timedelta(days=1)
 
         # buffer dupa rezervare

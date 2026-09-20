@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 
 from tools import calendar_flota as cal
 from tools import datastore
+from tools.perioada import PerioadaInchiriere
 from tools.registry import register_tool
 
 
@@ -106,10 +107,10 @@ def check_availability(params: DisponibilitateParams) -> str:
     for v in candidati:
         partener = datastore.partenerul_vehiculului(v)
         moneda = datastore.moneda(v)
-        unitati = cal.numar_unitati(partener, start, sfarsit)
-        pe_nopti = partener["reguli_operationale"]["sistem_calcul"] == "nopti"
-        eticheta_unitati = "nopti" if pe_nopti else "zile"
-        unitate_singular = "noapte" if pe_nopti else "zi"
+        perioada = PerioadaInchiriere.din_date(partener, start, sfarsit)
+        unitati = perioada.unitati
+        eticheta_unitati = perioada.eticheta
+        unitate_singular = perioada.unitate_singular
 
         liber, motive = cal.este_liber(v["id"], partener, start, sfarsit)
         if not liber:
@@ -133,13 +134,24 @@ def check_availability(params: DisponibilitateParams) -> str:
             )
             continue
 
-        tarif = v["tarife_sezon"].get(sezon["cod"])
+        try:
+            tarif = datastore.tarif_sezon(v, sezon["cod"])
+        except KeyError as e:
+            # Fara tarif nu avem ce oferi: mai bine spunem ca lipseste decat
+            # sa afisam vehiculul ca disponibil "la 0".
+            ocupate.append(f"  {v['id']} - {v['nume_comercial']}: EROARE DE CONFIGURARE - {e.args[0]}")
+            continue
         rand = [
             f"  {v['id']} - {v['nume_comercial']} ({v['tip']}, {v['locuri_dormit']} locuri de dormit, "
             f"{v['transmisie']}, permis {v['permis_necesar']})",
             f"      {unitati} {eticheta_unitati} | tarif {sezon['nume'].lower()}: "
             f"{tarif} {moneda}/{unitate_singular} | predare: {v['punct_predare']}",
         ]
+
+        # Documentele expirate nu scot vehiculul din lista (pot fi reinnoite
+        # pana la preluare), dar trebuie spuse clientului.
+        for problema in datastore.documente_expirate(v["id"], perioada.predare):
+            rand.append(f"      ATENTIE: {problema}")
 
         # Zile cu reducere de matching care cad in perioada ceruta
         reduceri = cal.reduceri_matching(v["id"], partener)

@@ -14,6 +14,7 @@ Fisierul NU importa niciun tool si nu e un tool el insusi.
 """
 
 import json
+from datetime import date
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -105,19 +106,33 @@ def mentenanta_vehiculului(vehicul_id: str) -> dict | None:
 # ---------------------------------------------------------------------
 def status_rezervare(cod: str) -> dict:
     """
-    Fisa unui status. Daca nu-l gasim, returnam varianta cea mai prudenta:
-    nu blocheaza, nu ancoreaza, nu avertizeaza.
+    Fisa unui status. Daca nu-l gasim, returnam varianta prudenta: BLOCHEAZA.
+
+    De ce blocheaza si nu invers: un cod nerecunoscut inseamna aproape mereu o
+    greseala de scriere in rezervari.json. Daca l-am ignora, o rezervare reala
+    ar disparea din calendar si am inchiria de doua ori acelasi vehicul. Asa,
+    cel mult refuzam o perioada libera - greseala care se repara cu un telefon,
+    nu cu doi clienti in fata aceleiasi autorulote.
+
+    Steagul 'necunoscut' ajunge in raspunsul tool-urilor ca avertisment, iar
+    valideaza_configurarea() semnaleaza problema inca de la pornire.
     """
     for s in _incarca("nomenclatoare.json")["statusuri_rezervare"]:
         if s["cod"] == cod:
             return s
     return {
         "cod": cod,
-        "nume": cod,
-        "blocheaza_calendar": False,
+        "nume": f"{cod} (status necunoscut)",
+        "blocheaza_calendar": True,
         "ancoreaza_matching": False,
-        "avertizeaza": False,
+        "avertizeaza": True,
+        "necunoscut": True,
     }
+
+
+def status_necunoscut(rezervare: dict) -> bool:
+    """Rezervarea are un status care nu exista in nomenclator?"""
+    return bool(status_rezervare(rezervare["status"]).get("necunoscut"))
 
 
 def blocheaza_calendarul(rezervare: dict) -> bool:
@@ -207,3 +222,115 @@ def extraoptiunile_vehiculului(v: dict) -> list[dict]:
 
 def moneda(v: dict) -> str:
     return partenerul_vehiculului(v)["reguli_operationale"].get("moneda", "EUR")
+
+
+# ---------------------------------------------------------------------
+# Tarife - lipsa unui tarif NU e zero
+# ---------------------------------------------------------------------
+def tarif_sezon(v: dict, cod_sezon: str) -> float:
+    """
+    Tariful vehiculului pentru un sezon. Arunca daca lipseste.
+
+    Varianta veche, .get(cod, 0), era "fail open": o greseala de configurare
+    producea o zi gratuita intr-un deviz, fara ca nimeni sa observe. Un pret
+    gresit trimis clientului e mai scump decat o oferta refuzata, deci aici
+    oprim calculul si spunem exact ce lipseste.
+    """
+    tarife = v.get("tarife_sezon") or {}
+    if cod_sezon not in tarife:
+        disponibile = ", ".join(sorted(tarife)) or "(niciunul)"
+        raise KeyError(
+            f"Vehiculul {v['id']} nu are tarif pentru sezonul {cod_sezon!r}. "
+            f"Sezoane cu tarif definit: {disponibile}. Completeaza data/flota.json."
+        )
+    return float(tarife[cod_sezon])
+
+
+# ---------------------------------------------------------------------
+# Documentele vehiculului (ITP, RCA, rovinieta, CASCO)
+# ---------------------------------------------------------------------
+DOCUMENTE = {
+    "itp_expira": "ITP",
+    "rca_expira": "RCA",
+    "casco_expira": "CASCO",
+    "rovinieta_expira": "Rovinieta",
+}
+
+
+def documente_expirate(vehicul_id: str, pana_la: date) -> list[str]:
+    """
+    Documentele care expira inainte de o data (de regula ziua predarii).
+
+    Nu blocheaza inchirierea - vehiculul poate fi disponibil, iar documentul
+    reinnoit intre timp. Dar clientul trebuie sa afle, iar operatorul la fel.
+    """
+    m = mentenanta_vehiculului(vehicul_id)
+    if not m:
+        return []
+
+    probleme: list[str] = []
+    for camp, eticheta in DOCUMENTE.items():
+        text = m.get(camp)
+        if not text:
+            probleme.append(f"{eticheta}: data lipseste din fisa de mentenanta")
+            continue
+        try:
+            scadenta = date.fromisoformat(text)
+        except ValueError:
+            probleme.append(f"{eticheta}: data {text!r} e invalida in fisa de mentenanta")
+            continue
+        if scadenta < pana_la:
+            probleme.append(f"{eticheta} expira la {scadenta.isoformat()}, inainte de predare")
+    return probleme
+
+
+# ---------------------------------------------------------------------
+# Validarea datelor, la pornire si la /reload
+# ---------------------------------------------------------------------
+def valideaza_configurarea() -> list[str]:
+    """
+    Verifica integritatea pe care un fisier JSON nu o poate garanta singur.
+
+    O baza de date ar refuza din oficiu un partener_id inexistent sau un status
+    inventat. JSON-ul accepta orice, deci verificam noi - si o facem la fiecare
+    pornire, nu cand isi aminteste cineva sa ruleze un script separat.
+    """
+    probleme: list[str] = []
+
+    parteneri = {p["id"]: p for p in _incarca("parteneri.json")["parteneri"]}
+    statusuri = {s["cod"] for s in _incarca("nomenclatoare.json")["statusuri_rezervare"]}
+    extra_globale = {e["id"] for e in _incarca("extraoptiuni.json")["extraoptiuni"]}
+    vehicule = {v["id"]: v for v in _incarca("flota.json")["vehicule"]}
+
+    # 1. Fiecare vehicul are un partener real si tarif pentru toate sezoanele lui.
+    for vid, v in vehicule.items():
+        p = parteneri.get(v.get("partener_id"))
+        if p is None:
+            probleme.append(f"{vid}: partener inexistent {v.get('partener_id')!r}")
+            continue
+        for sezon in p.get("sezoane", []):
+            if sezon["cod"] not in (v.get("tarife_sezon") or {}):
+                probleme.append(
+                    f"{vid}: lipseste tariful pentru sezonul {sezon['cod']!r} "
+                    f"(partener {p['id']})"
+                )
+
+    # 2. Rezervarile indica vehicule si statusuri care exista.
+    for r in _incarca("rezervari.json")["rezervari"]:
+        if r["vehicul_id"] not in vehicule:
+            probleme.append(f"{r['id']}: vehicul inexistent {r['vehicul_id']!r}")
+        if r["status"] not in statusuri:
+            probleme.append(
+                f"{r['id']}: status necunoscut {r['status']!r}. "
+                f"Pana la corectare, rezervarea BLOCHEAZA calendarul."
+            )
+
+    # 3. Extraoptiunile oferite de parteneri exista in nomenclatorul global.
+    for p in parteneri.values():
+        for extra_id in (p.get("preturi_extraoptiuni") or {}):
+            if extra_id not in extra_globale:
+                probleme.append(
+                    f"partenerul {p['id']}: extraoptiune inexistenta {extra_id!r}"
+                )
+
+    return probleme

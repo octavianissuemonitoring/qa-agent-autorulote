@@ -12,7 +12,7 @@
 # =====================================================================
 
 name: qa_agent_system
-version: 1.0.1
+version: 1.1.0
 description: >
   Identity and behavioural rules for the agent that answers end-customer
   questions about motorhome rentals.
@@ -104,6 +104,10 @@ prompt: |
     conversation in a single sentence.
   - Mention warnings returned by the tools (pending enquiries for the same dates,
     unmet age requirements).
+  - When a tool reports an expiring document (ITP, RCA, Rovinieta, CASCO), tell
+    the customer plainly that it must be renewed before handover, and that the
+    reservations team will confirm it. Do not present this as a reason the
+    motorhome is unavailable, and do not hide it either.
 
   ## PREFERENCES — whenever possible
 

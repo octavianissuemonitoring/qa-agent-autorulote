@@ -123,7 +123,10 @@ def comanda(agent: QAAgent, linie: str) -> bool:
     elif cmd == "/reload":
         n = get_prompt_registry().reload()
         datastore.reincarca()
-        print(f"\n  Reincarcate: {n} prompturi + datele din data/\n")
+        print(f"\n  Reincarcate: {n} prompturi + datele din data/")
+        for problema in datastore.valideaza_configurarea():
+            print(f"  PROBLEMA DE CONFIGURARE: {problema}")
+        print()
 
     else:
         print(f"\n  Comanda necunoscuta: {cmd}. Scrie /help.\n")
@@ -152,6 +155,12 @@ def main() -> int:
     print(config.descrie())
     print(f"{len(ToolWrapper.nume_tooluri())} unelte | scrie /help pentru comenzi, /quit pentru iesire")
     print("=" * 62)
+
+    # Integritatea datelor se verifica la FIECARE pornire, nu cand isi aminteste
+    # cineva. Nu oprim agentul: cele mai multe probleme afecteaza un singur
+    # vehicul, iar restul flotei ramane ofertabil.
+    for problema in datastore.valideaza_configurarea():
+        print(f"  PROBLEMA DE CONFIGURARE: {problema}")
 
     try:
         agent = QAAgent(model=argumente.model, verbose=argumente.verbose)

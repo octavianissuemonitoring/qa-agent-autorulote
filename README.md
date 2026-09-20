@@ -87,6 +87,23 @@ macOS (cu mediul activat):
 python main.py
 ```
 
+## Reguli de business: unde stau și cum eșuează
+
+- **Perioada** e un singur tip, `tools/perioada.py`. Partenerii facturează zile
+  sau nopți; `PerioadaInchiriere` e singurul loc care traduce între date
+  calendaristice și unități facturabile. Disponibilitate, matching și ofertare
+  primesc același obiect, deci nu mai pot înțelege altceva din aceleași date.
+- **Fail closed**: un tarif lipsă sau un sezon nedefinit opresc oferta cu
+  `EROARE DE CONFIGURARE`, în loc să producă o zi la preț 0. Un status de
+  rezervare necunoscut blochează calendarul, ca să nu apară dubla rezervare.
+- **Validare la pornire**: `datastore.valideaza_configurarea()` rulează la
+  fiecare pornire și la `/reload`, și verifică tarifele pe sezoane, statusurile
+  rezervărilor, extraopțiunile și partenerii. Problemele se afișează ca
+  `PROBLEMA DE CONFIGURARE`, fără să oprească agentul.
+- **Documentele** (ITP, RCA, rovinietă, CASCO) care expiră înainte de predare
+  apar ca avertisment în disponibilitate și în deviz. Nu blochează închirierea:
+  pot fi reînnoite până la preluare, iar agentul îi spune clientului.
+
 ## Plasele de siguranță (S6.7)
 
 Patru limite, toate reglabile din `.env`:
