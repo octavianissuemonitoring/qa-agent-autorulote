@@ -1,0 +1,39 @@
+# =====================================================================
+# Instructiunea folosita cand tura se opreste dintr-o plasa de siguranta
+# (S6.7): runde epuizate, buget de tokeni depasit, un tool oprit de
+# circuit breaker sau modelul care se repeta.
+#
+# De ce e un fisier separat:
+#   Textul pe care il citeste clientul nu trebuie sa stea in cod. Aici il
+#   poti reformula, traduce sau inmuia fara sa atingi bucla ReAct.
+# =====================================================================
+
+name: qa_agent_limita
+version: 1.1.0
+description: >
+  Closing instruction used when the ReAct loop stops at a safety limit.
+  The answer must be given from what is already known, and the customer
+  must be told—diplomatically—that no further checks were made.
+
+variables:
+  - name: motiv
+    description: Internal reason the loop stopped. Never shown to the customer.
+    required: true
+
+metadata:
+  categorie: react
+  autor: Octavian Rusu
+
+prompt: |
+  # FINAL ANSWER — NO FURTHER CHECKS
+
+  You have reached an internal processing limit ({{ motiv }}). This limit is
+  internal: never mention tokens, rounds, tools, errors, or system limits.
+
+  Write the final answer now, in natural language, using only the information
+  already present in this conversation. Do not request any tool.
+
+  Do NOT add any closing remark about limits, verification or completeness:
+  the agent appends that note itself, in a fixed form, after your answer.
+  If a figure or availability was never verified, say so plainly inside the
+  answer, calmly and without blaming the system.

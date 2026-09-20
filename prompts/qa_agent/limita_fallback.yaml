@@ -1,0 +1,29 @@
+# =====================================================================
+# Textul de rezerva, trimis clientului cand nici raspunsul final fortat
+# nu a iesit (modelul a returnat text gol - se intampla cand rationamentul
+# intern consuma tot bugetul MAX_TOKENS).
+#
+# E singurul text din proiect pe care il citeste clientul fara ca modelul
+# sa-l fi scris. De aceea sta tot aici, in YAML, nu in cod.
+# =====================================================================
+
+name: qa_agent_limita_text
+version: 1.0.0
+description: >
+  Static, customer-facing fallback used when even the forced final answer
+  comes back empty. Must never mention tokens, rounds, tools or limits.
+
+variables: []
+
+metadata:
+  categorie: react
+  autor: Octavian Rusu
+
+prompt: |
+  Am adunat o parte din informații, dar nu am reușit să duc verificarea până la
+  capăt pentru această solicitare, așa că prefer să nu vă dau cifre pe care nu
+  le-am confirmat.
+
+  Spuneți-mi, vă rog, ce anume contează cel mai mult — o anumită autorulotă,
+  perioada exactă sau bugetul — și verific punctual, ca să primiți un răspuns
+  sigur.

@@ -1,0 +1,23 @@
+# =====================================================================
+# Mentiunea adaugata la finalul oricarui raspuns dat dupa atingerea unei
+# limite (S6.7). NU o scrie modelul: o adauga agentul, mereu, ca sa nu
+# depinda de cat de bine asculta modelul instructiunea.
+# =====================================================================
+
+name: qa_agent_limita_nota
+version: 1.0.0
+description: >
+  Static closing note appended to any answer produced after a safety limit,
+  so the customer always learns the answer was not verified further.
+
+variables: []
+
+metadata:
+  categorie: react
+  autor: Octavian Rusu
+
+prompt: |
+  _Mențiune: răspunsul de mai sus se bazează pe verificările făcute până în
+  acest punct și pot exista detalii pe care nu am apucat să le confirm.
+  Spuneți-mi ce anume contează cel mai mult și verific punctual, ca să aveți
+  o confirmare sigură._

@@ -502,15 +502,13 @@ class QAAgent:
                 )
 
         # --- Plasa de siguranta: s-au terminat rundele (S6.7) --------------
-        self._spune("STOP", f"limita de {self.max_iteratii} runde atinsa")
-        text = (
-            f"Nu am reusit sa ajung la un raspuns complet in {self.max_iteratii} runde de "
-            f"verificari ({apeluri_totale} consultari). Te rog reformuleaza intrebarea sau "
-            f"imparte-o in intrebari mai mici."
+        # Si aici clientul primeste un raspuns, nu un mesaj de eroare: modelul
+        # formuleaza din ce a strans in cele {max_iteratii} runde.
+        return self._raspuns_final_fortat(
+            mesaje,
+            mesaj_user,
+            f"cele {self.max_iteratii} runde s-au epuizat dupa {apeluri_totale} consultari",
         )
-        self.istoric.append(mesaj_user)
-        self.istoric.append(AIMessage(content=text))
-        return text
 
     def _raspuns_final_fortat(
         self, mesaje: list[BaseMessage], mesaj_user: HumanMessage, motiv: str
@@ -519,22 +517,31 @@ class QAAgent:
         Iesire controlata din bucla (S6.7): mai apelam modelul o singura data,
         FARA unelte. Neavand ce sa ceara, e obligat sa formuleze raspunsul din
         ce a strans pana acum. Clientul primeste un raspuns, nu o eroare.
+
+        Instructiunea de inchidere sta in prompts/qa_agent/limita_prompt.yaml:
+        raspunsul se incheie cu o mentiune politicoasa ca nu s-au mai facut
+        verificari si ca detaliile pot fi incomplete. Clientul afla asta in
+        limbajul lui, fara sa auda de tokeni, runde sau unelte.
         """
         self._spune("FORTEAZA", motiv)
-        final = self.llm.invoke(
-            mesaje
-            + [
-                SystemMessage(
-                    content=(
-                        "Ai toate informatiile necesare mai sus. Formuleaza ACUM "
-                        "raspunsul final pentru client, in limbaj natural. Nu mai "
-                        "cere nicio unealta."
-                    )
-                )
-            ]
-        )
+        instructiune = get_prompt_registry().render("qa_agent_limita", motiv=motiv)
+        final = self.llm.invoke(mesaje + [SystemMessage(content=instructiune)])
         self._numara_tokeni(final)
         text = text_din(final)
+
+        # Plasa de siguranta a plasei de siguranta: modelele care "gandesc"
+        # (Gemini 3.x) consuma tokeni de iesire pe rationament intern. Daca
+        # MAX_TOKENS se termina acolo, `text` iese gol - si clientul ar primi
+        # un mesaj gol. Atunci ii raspundem cu textul fix din YAML.
+        if not text.strip():
+            self._spune("GOL", "raspunsul final a iesit gol - folosesc textul de rezerva")
+            text = get_prompt_registry().render("qa_agent_limita_text")
+        else:
+            # Mentiunea o adaugam NOI, nu modelul: altfel apare doar cand
+            # modelul are chef sa asculte instructiunea. Clientul afla mereu
+            # ca raspunsul nu a mai fost verificat mai departe.
+            text = text.rstrip() + "\n\n" + get_prompt_registry().render("qa_agent_limita_nota")
+
         self.istoric.append(mesaj_user)
         self.istoric.append(AIMessage(content=text))
         return text

@@ -106,6 +106,10 @@ scrise direct în cod.
 
 La oricare dintre ele, agentul nu crapă: mai cere modelului un răspuns final,
 fără unelte, din informațiile strânse până atunci (`_raspuns_final_fortat()`).
+Răspunsul se încheie mereu cu o mențiune pentru client — informațiile pot fi
+incomplete și nu s-au mai făcut verificări — adăugată de agent, nu de model,
+din `prompts/qa_agent/limita_nota.yaml`. Clientul nu află niciodată de tokeni,
+runde sau unelte.
 
 ## Modelele AI: active și inactive
 
