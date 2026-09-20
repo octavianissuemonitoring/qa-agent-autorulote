@@ -1,0 +1,12 @@
+# ---------------------------------------------------------------
+# Dependinte doar pentru dezvoltare (testele). Aplicatia nu are
+# nevoie de ele ca sa ruleze.
+#
+# Instalare:
+#   macOS:    VIRTUAL_ENV=~/.venvs/qa-agent-autorulote uv pip install -r requirements-dev.txt
+#   Windows:  py -3.11 -m pip install -r requirements-dev.txt
+# ---------------------------------------------------------------
+
+-r requirements.txt
+
+pytest==8.4.2

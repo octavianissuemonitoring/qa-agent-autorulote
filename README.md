@@ -87,6 +87,34 @@ macOS (cu mediul activat):
 python main.py
 ```
 
+## Teste
+
+```bash
+pytest
+```
+
+136 de teste, sub 2 secunde, fără rețea și fără cheie de API. Instalare:
+
+```bash
+VIRTUAL_ENV=~/.venvs/qa-agent-autorulote uv pip install -r requirements-dev.txt
+```
+
+| Fișier | Ce acoperă |
+|---|---|
+| `tests/test_perioada.py` | zile vs nopți, treceri peste lună/an, an bisect |
+| `tests/test_calendar.py` | sezoane, buffer, ferestre libere, statusuri, ancore |
+| `tests/test_datastore.py` | tarife lipsă, statusuri necunoscute, documente, validare |
+| `tests/test_ofertare.py` | durată minimă, discounturi în cascadă, rotunjiri, km |
+| `tests/test_tools.py` | registry, catalog, cele 4 erori din S6.6, disponibilitate, matching |
+| `tests/test_agent_react.py` | bucla ReAct cu un model fals: paralel, timeout, circuit breaker, buget |
+
+Două reguli de construcție:
+
+- **Testele nu ating `data/`.** Fixture-ul `date_test` face o copie a JSON-urilor
+  într-un folder temporar și îndreaptă `datastore` către ea (`tests/conftest.py`).
+- **Bucla ReAct se testează cu un model fals**, un obiect cu `.invoke()` care
+  întoarce `AIMessage`. Fără rețea, fără costuri, rezultate identice la fiecare rulare.
+
 ## Reguli de business: unde stau și cum eșuează
 
 - **Perioada** e un singur tip, `tools/perioada.py`. Partenerii facturează zile

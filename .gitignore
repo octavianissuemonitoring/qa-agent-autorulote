@@ -12,3 +12,6 @@ __pycache__/
 # Sistem
 .DS_Store
 Thumbs.db
+
+# Cache pytest
+.pytest_cache/
